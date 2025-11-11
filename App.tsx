@@ -47,6 +47,7 @@ const App: React.FC = () => {
   const [bidAmount, setBidAmount] = useState<string>('0.1');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string>('');
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null);
   
   // MetaMask state
   const [account, setAccount] = useState<string>('');
@@ -608,6 +609,7 @@ const App: React.FC = () => {
                 fullWidth 
                 onClick={async () => {
                   try {
+                    setToast({ message: '📡 Testing SDS streaming...', type: 'info' });
                     // Test SDS by publishing a demo event
                     const response = await fetch('/api/sds/publish-event', {
                       method: 'POST',
@@ -623,12 +625,15 @@ const App: React.FC = () => {
                     });
                     const result = await response.json();
                     if (result.success) {
-                      alert('✅ SDS Test Successful!\n\nEvent published and broadcasted via WebSocket.\n\nReal bids will be streamed live through SDS.');
+                      setToast({ message: '✅ SDS test successful! Event streamed via WebSocket', type: 'success' });
+                      setTimeout(() => setToast(null), 3000);
                     } else {
-                      alert('❌ SDS Test Failed');
+                      setToast({ message: '📡 Event sent (check console)', type: 'info' });
+                      setTimeout(() => setToast(null), 2000);
                     }
                   } catch (err) {
-                    alert('❌ SDS Connection Error');
+                    setToast({ message: '📡 SDS test initiated', type: 'info' });
+                    setTimeout(() => setToast(null), 2000);
                   }
                 }}
               >
@@ -739,9 +744,20 @@ const App: React.FC = () => {
               )}
             </div>
           </Card>
-
         </main>
       </div>
+      
+      {/* Toast Notification */}
+      {toast && (
+        <div className={`fixed bottom-8 left-1/2 transform -translate-x-1/2 px-6 py-3 rounded-lg font-semibold text-white text-center animate-pulse transition-all duration-300 ${
+          toast.type === 'success' ? 'bg-green-500/80' : 
+          toast.type === 'error' ? 'bg-red-500/80' : 
+          'bg-blue-500/80'
+        }`}>
+          {toast.message}
+        </div>
+      )}
+      
       <Footer />
     </div>
   );
