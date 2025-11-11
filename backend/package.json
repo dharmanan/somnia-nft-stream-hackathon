@@ -1,0 +1,17 @@
+{
+  "name": "somnia-backend",
+  "version": "1.0.0",
+  "description": "Somnia NFT Stream Backend with WebSocket",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "ws": "^8.14.2",
+    "@somnia-chain/streams": "^1.0.0",
+    "cors": "^2.8.5"
+  }
+}
