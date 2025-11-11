@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import type { NFT } from '../types';
-import { generateDescription } from '../services/geminiService';
 import { CountdownTimer } from './CountdownTimer';
 import { Button } from './Button';
 
@@ -23,7 +22,8 @@ export const FeaturedNFT: React.FC<FeaturedNFTProps> = ({ item }) => {
   useEffect(() => {
     const fetchDescription = async () => {
       setIsLoading(true);
-      const desc = await generateDescription(item.title, item.creator);
+      // Use static description - no external API calls
+      const desc = `A captivating piece titled "${item.title}" by the visionary artist ${item.creator}. This NFT represents a unique moment in digital art history, blending creativity with blockchain innovation.`;
       setDescription(desc);
       setIsLoading(false);
     };
