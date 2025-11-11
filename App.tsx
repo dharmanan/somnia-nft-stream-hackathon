@@ -587,10 +587,10 @@ const App: React.FC = () => {
                   <p className="text-gray-400">Waiting for first bid...</p>
                 )}
                 <div className="text-xs text-gray-500">
-                  ✓ Real-time updates via HTTP polling
+                  💡 Real-time updates via HTTP polling (WebSocket disabled for Vercel compatibility)
                 </div>
                 <div className="text-xs text-indigo-400 font-semibold">
-                  🔄 Blockchain streaming via SDS
+                  � Live SDS Stream (Somnia Data Stream)
                 </div>
               </div>
             </Card>
