@@ -1,20 +1,82 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# Somnia NFT Stream - Hackathon Project
 
-# Run and deploy your AI Studio app
+A real-time NFT streaming and auction platform built on the **Somnia Testnet** with WebSocket integration and SDS (Somnia Data Streams) support.
 
-This contains everything you need to run your app locally.
+## Features
 
-View your app in AI Studio: https://ai.studio/apps/drive/1GxZHkbG18BY_LDiwjZ_vJxbB6pP8NeQi
+- 🔗 **Blockchain Integration**: Connected to Somnia Testnet (Chain ID: 50312)
+- 💼 **MetaMask Wallet Support**: Connect your wallet for transactions
+- 📡 **WebSocket Real-time Updates**: Live data streaming from backend
+- 🌊 **SDS Integration**: Somnia Data Streams for blockchain events
+- 🎨 **React + TypeScript**: Modern frontend with Tailwind CSS
+- ⚡ **Vite Build System**: Fast development and production builds
+- 🚀 **Vercel Deployment**: Production-ready backend API
 
-## Run Locally
+## Quick Start
 
-**Prerequisites:**  Node.js
+### Prerequisites
+- Node.js 16+
+- npm or yarn
+- MetaMask wallet
 
+### Installation
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/dharmanan/somnia-nft-stream-hackathon
+   cd somnia-nft-stream-hackathon
+   ```
+
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+
+3. Run locally:
+   ```bash
+   npm run dev
+   ```
+
+4. Build for production:
+   ```bash
+   npm run build
+   ```
+
+## Project Structure
+
+- `/components` - React components (Header, Cards, Wallet, etc.)
+- `/services` - Service layer (API integrations)
+- `/backend` - Express server with WebSocket + SDS integration
+- `App.tsx` - Main application component
+- `constants.ts` - Configuration and constants
+
+## Network Details
+
+**Somnia Testnet:**
+- Chain ID: 50312
+- RPC: https://dream-rpc.somnia.network/
+- Explorer: https://shannon-explorer.somnia.network/
+
+## Backend API
+
+Backend runs on port 3001:
+- `GET /health` - Health check
+- `POST /api/test-sds` - Test SDS integration
+- `WS ws://localhost:3001` - WebSocket connection
+
+## Deployment
+
+Frontend deployed on Vercel, backend as serverless Node.js function.
+
+Production URL: [https://backend-ktsyvd3vl-kohens-projects.vercel.app](https://backend-ktsyvd3vl-kohens-projects.vercel.app)
+
+## Technologies
+
+- **Frontend**: React 19, TypeScript 5.8, Tailwind CSS, ethers.js 6
+- **Backend**: Express.js, WebSocket (ws), @somnia-chain/streams
+- **Build**: Vite 6, npm
+- **Deployment**: Vercel
+
+## License
+
+MIT
