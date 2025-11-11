@@ -587,10 +587,10 @@ const App: React.FC = () => {
                   <p className="text-gray-400">Waiting for first bid...</p>
                 )}
                 <div className="text-xs text-gray-500">
-                  💡 Real-time updates via HTTP polling (WebSocket disabled for Vercel compatibility)
+                  💡 HTTP polling (Backend API required for live SDS)
                 </div>
                 <div className="text-xs text-indigo-400 font-semibold">
-                  � Live SDS Stream (Somnia Data Stream)
+                  🔌 SDS Integration Ready (Connect backend for live stream)
                 </div>
               </div>
             </Card>
