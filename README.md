@@ -8,7 +8,7 @@ A cutting-edge NFT auction platform built for the Somnia Data Streams Mini Hacka
 ⚠️ TESTNET - For Testing Only
 
 Network: Somnia Testnet (Shannon) - Chain ID: 50312
-Currency: Test STT tokens (get from Somnia Faucet)
+Currency: Test STT tokens ([Get from Somnia Faucet](https://testnet.somnia.network/))
 All transactions are on testnet - No real value, for development and testing only
 
 ## Features
@@ -152,7 +152,7 @@ When a new bid is detected:
 
 - **Node.js** 18+ - Runtime environment
 - **MetaMask** - Web3 wallet browser extension
-- **STT Tokens** - Somnia testnet native currency (faucet available)
+- **STT Tokens** - Somnia testnet native currency ([Get from Faucet](https://testnet.somnia.network/))
 
 ## � Quick Start (Local Development)
 
