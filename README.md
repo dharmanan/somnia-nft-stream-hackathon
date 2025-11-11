@@ -1,6 +1,8 @@
+# Somnia NFT Stream - Hackathon Project
+
 A cutting-edge NFT auction platform built for the Somnia Data Streams Mini Hackathon, featuring real-time blockchain data streaming, secure smart contracts, and seamless Web3 integration.
 
-🚀 Live Demo
+## 🚀 Live Demo
 🎯 Try the Live Demo: https://somniastream.vercel.app/
 
 ⚠️ TESTNET - For Testing Only
@@ -25,7 +27,7 @@ This project demonstrates the power of Somnia Data Streams (SDS) by creating a f
 - Schema-based data encoding ensures type-safe blockchain communication
 - Decentralized architecture maintains transparency and security
 
-## � Key Features
+## ⭐ Key Features
 
 ### ✅ Somnia Data Streams Integration
 - `@somnia-chain/streams` SDK for blockchain data streaming
@@ -103,22 +105,22 @@ When a new bid is detected:
 ## 🏗️ Architecture
 
 ```
-┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│   Frontend      │    │   Backend       │    │   Smart         │
-│   (React)       │◄──►│   (Express.js)  │◄──►│   Contracts     │
-│                 │    │                 │    │   (Solidity)    │
-│ • Wallet Connect│    │ • API Endpoints │    │                 │
-│ • Bid Interface │    │ • SDS Integration│    │ • Auction Logic │
-│ • Real-time UI  │    │ • Contract Calls │    │ • NFT Minting   │
-└─────────────────┘    └─────────────────┘    └─────────────────┘
-         │                       │                       │
-         └───────────────────────┼───────────────────────┘
-                                 │
-                          ┌─────────────────┐
-                          │ Somnia Data    │
-                          │ Streams (SDS)  │
-                          │ Blockchain     │
-                          └─────────────────┘
+┌──────────────────┐    ┌──────────────────┐    ┌──────────────────┐
+│   Frontend       │    │   Backend        │    │   Smart          │
+│   (React)        │◄──►│   (Express.js)   │◄──►│   Contracts      │
+│                  │    │                  │    │   (Solidity)     │
+│ • Wallet Connect │    │ • API Endpoints  │    │                  │
+│ • Bid Interface  │    │ • SDS Integration│    │ • Auction Logic  │
+│ • Real-time UI   │    │ • Contract Calls │    │ • NFT Minting    │
+└──────────────────┘    └──────────────────┘    └──────────────────┘
+          │                       │                       │
+          └───────────────────────┼───────────────────────┘
+                                  │
+                           ┌──────────────────┐
+                           │ Somnia Data      │
+                           │ Streams (SDS)    │
+                           │ Blockchain       │
+                           └──────────────────┘
 ```
 
 ## �️ Technology Stack
