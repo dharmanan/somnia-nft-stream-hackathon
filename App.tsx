@@ -115,7 +115,12 @@ const App: React.FC = () => {
   // WebSocket connection for real-time updates
   useEffect(() => {
     const connectWebSocket = () => {
-      const websocket = new WebSocket('ws://localhost:3001');
+      // Detect environment and use appropriate backend URL
+      const backendUrl = typeof window !== 'undefined' && window.location.hostname === 'localhost' 
+        ? 'ws://localhost:3001' 
+        : 'wss://backend-4hyellmsz-kohens-projects.vercel.app';
+      
+      const websocket = new WebSocket(backendUrl);
 
       websocket.onopen = () => {
         console.log('🔌 Connected to WebSocket for real-time SDS updates');
