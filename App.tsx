@@ -587,7 +587,7 @@ const App: React.FC = () => {
                   <p className="text-gray-400">Waiting for first bid...</p>
                 )}
                 <div className="text-xs text-gray-500">
-                  WebSocket: ws://localhost:3000
+                  ✓ Real-time updates via HTTP polling
                 </div>
                 <div className="text-xs text-indigo-400 font-semibold">
                   🔄 Blockchain streaming via SDS
