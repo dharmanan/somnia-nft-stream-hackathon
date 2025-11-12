@@ -299,6 +299,14 @@ const App: React.FC = () => {
     console.log('🔗 Connecting to wallet...');
     console.log('Wallet available:', !!window.ethereum);
 
+    // Disconnect any previous connection first
+    if (isConnected) {
+      console.log('⚠️ Already connected, disconnecting previous connection...');
+      disconnectWallet();
+      // Wait a bit for disconnect to complete
+      await new Promise(resolve => setTimeout(resolve, 100));
+    }
+
     if (!isWalletInstalled()) {
       // Show error with WalletConnect option
       setError('No Web3 wallet detected. Please install MetaMask, Brave Wallet, or use WalletConnect at https://walletconnect.com/');
@@ -391,6 +399,12 @@ const App: React.FC = () => {
     setIsConnected(false);
     setNetworkName('');
     setError('');
+    
+    // Remove event listeners when disconnecting
+    if (window.ethereum) {
+      window.ethereum.removeAllListeners?.();
+    }
+    
     setToast({
       message: '✅ Wallet disconnected. You can now connect a different wallet.',
       type: 'success'
@@ -400,31 +414,34 @@ const App: React.FC = () => {
 
   // Listen for account changes
   useEffect(() => {
-    if (window.ethereum) {
-      window.ethereum.on('accountsChanged', (accounts: string[]) => {
+    if (window.ethereum && isConnected) {
+      const handleAccountsChanged = (accounts: string[]) => {
+        console.log('👛 Accounts changed:', accounts);
         if (accounts.length > 0) {
           setAccount(accounts[0]);
           setIsConnected(true);
         } else {
-          setAccount('');
-          setIsConnected(false);
+          // Disconnect if no accounts
+          disconnectWallet();
         }
-      });
+      };
 
-      window.ethereum.on('chainChanged', (chainId: string) => {
+      const handleChainChanged = (chainId: string) => {
+        console.log('🌐 Chain changed:', chainId);
         setNetworkName(chainId === '0xC488' ? 'Somnia Testnet' : 'Unknown Network');
         // Reload the page when network changes
         window.location.reload();
-      });
-    }
+      };
 
-    return () => {
-      if (window.ethereum) {
-        window.ethereum.removeAllListeners('accountsChanged');
-        window.ethereum.removeAllListeners('chainChanged');
-      }
-    };
-  }, []);
+      window.ethereum.on('accountsChanged', handleAccountsChanged);
+      window.ethereum.on('chainChanged', handleChainChanged);
+
+      return () => {
+        window.ethereum?.removeListener('accountsChanged', handleAccountsChanged);
+        window.ethereum?.removeListener('chainChanged', handleChainChanged);
+      };
+    }
+  }, [isConnected]);
 
   // Bid placement with MetaMask
   const placeBid = async () => {
