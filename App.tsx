@@ -187,7 +187,22 @@ const App: React.FC = () => {
               address: `${data.data.bidder.slice(0, 6)}...${data.data.bidder.slice(-4)}`,
               amount: parseFloat(data.data.bidAmount)
             };
-            setBids(prev => [newBid, ...prev.slice(0, 9)]);
+            
+            // Prevent duplicate bids - check if this bid already exists in history
+            setBids(prev => {
+              // Check if this exact bid already exists
+              const isDuplicate = prev.some(
+                bid => bid.address === newBid.address && bid.amount === newBid.amount
+              );
+              
+              if (isDuplicate) {
+                console.log('⚠️ Duplicate bid prevented:', newBid);
+                return prev;
+              }
+              
+              return [newBid, ...prev.slice(0, 9)];
+            });
+            
             setLastBid(newBid);
             
             // Format event for display - flatten the data structure
