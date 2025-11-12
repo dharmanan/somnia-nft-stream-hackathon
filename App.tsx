@@ -482,14 +482,18 @@ const App: React.FC = () => {
       if (ws && ws.readyState === WebSocket.OPEN) {
         try {
           console.log('📡 Publishing bid to SDS via WebSocket...');
+          console.log(`   WebSocket state: ${ws.readyState} (1=OPEN, 2=CLOSING, 3=CLOSED)`);
           ws.send(JSON.stringify({
             type: 'publish_auction_event',
             ...bidPayload
           }));
           publishedViaWS = true;
+          console.log('✅ WebSocket message sent successfully');
         } catch (wsError) {
           console.warn('⚠️ WebSocket send failed:', wsError);
         }
+      } else {
+        console.warn(`⚠️ WebSocket not ready for publish. State: ${ws?.readyState || 'no ws'}`);
       }
 
       // Always also try REST as backup
