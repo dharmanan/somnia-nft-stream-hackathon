@@ -299,9 +299,6 @@ const App: React.FC = () => {
   const connectWallet = async () => {
     console.log('🔗 Connecting to wallet...');
     console.log('Wallet available:', !!window.ethereum);
-    
-    // Clear force disconnect marker
-    sessionStorage.removeItem('forceDisconnect');
 
     if (!isWalletInstalled()) {
       // Show error with WalletConnect option
@@ -395,12 +392,20 @@ const App: React.FC = () => {
 
   // Disconnect wallet
   const disconnectWallet = () => {
-    console.log('🔌 Disconnecting wallet...');
+    console.log('🔌 Disconnecting wallet - full reset...');
     
-    // Mark disconnect in session to prevent auto-reconnect
-    sessionStorage.setItem('forceDisconnect', 'true');
+    // Clear all storage
+    localStorage.clear();
+    sessionStorage.clear();
     
-    // Remove all listeners FIRST
+    // Clear cookies
+    document.cookie.split(";").forEach((c) => {
+      document.cookie = c
+        .replace(/^ +/, "")
+        .replace(/=.*/, `=;expires=${new Date().toUTCString()};path=/`);
+    });
+    
+    // Remove all listeners
     if (window.ethereum) {
       try {
         window.ethereum.removeAllListeners?.();
@@ -417,31 +422,26 @@ const App: React.FC = () => {
       setIsConnecting(false);
       setNetworkName('');
       setError('');
+      setBids([]);
+      setLastBid(null);
     });
     
-    console.log('✅ Wallet state cleared');
+    console.log('✅ All state cleared');
     
     setToast({
-      message: '✅ Wallet disconnected. Refresh page to connect new wallet.',
+      message: '✅ Wallet disconnected. Reloading page...',
       type: 'success'
     });
     
-    // Force page reload after 1 second to clear any lingering state
+    // Force hard reload - bypass cache
     setTimeout(() => {
-      window.location.reload();
-    }, 1000);
+      window.location.href = window.location.href;
+    }, 500);
   };
 
   // Listen for account changes - only when user explicitly switches account in wallet
   useEffect(() => {
     if (!window.ethereum) return;
-    
-    // Check if we're forcing disconnect
-    const forceDisconnect = sessionStorage.getItem('forceDisconnect') === 'true';
-    if (forceDisconnect) {
-      console.log('⚠️ Force disconnect active, skipping listener setup');
-      return;
-    }
 
     const handleAccountsChanged = (accounts: string[]) => {
       console.log('👛 Accounts changed in wallet:', accounts);
