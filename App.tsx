@@ -193,6 +193,7 @@ const App: React.FC = () => {
       websocket.onmessage = (event) => {
         try {
           const data = JSON.parse(event.data);
+          console.log('📥 WebSocket message received:', data.type, data);
           
           // Skip heartbeat messages
           if (data.type === 'heartbeat') {
