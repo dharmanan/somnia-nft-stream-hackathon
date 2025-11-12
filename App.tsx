@@ -752,18 +752,19 @@ const App: React.FC = () => {
 
           <Card title="Bid History" icon={<Icon name="history" />}>
             <div className="space-y-2 max-h-40 overflow-y-auto pr-2">
-              {bids.map((bid, index) => (
-                <div 
-                  key={`${bid.address}-${bid.amount}-${Date.now()}-${index}`} 
-                  className={`flex justify-between items-center bg-black/20 p-3 rounded-lg text-sm transition-all duration-500 ${
-                    index === 0 && bids.length > 0 ? 'animate-slide-in-right bg-indigo-500/20' : ''
-                  }`}
-                >
-                  <span className="font-mono text-gray-300">{bid.address}</span>
-                  <span className="font-bold text-indigo-400">{bid.amount.toFixed(4)} STT</span>
-                </div>
-              ))}
-              {bids.length === 0 && (
+              {bids && bids.length > 0 ? (
+                bids.slice(0, 10).map((bid, index) => (
+                  <div 
+                    key={index} 
+                    className={`flex justify-between items-center bg-black/20 p-3 rounded-lg text-sm transition-all duration-500 ${
+                      index === 0 ? 'animate-slide-in-right bg-indigo-500/20' : ''
+                    }`}
+                  >
+                    <span className="font-mono text-gray-300">{bid.address}</span>
+                    <span className="font-bold text-indigo-400">{bid.amount.toFixed(4)} STT</span>
+                  </div>
+                ))
+              ) : (
                 <p className="text-gray-500 text-sm text-center py-4">No bids yet...</p>
               )}
             </div>
