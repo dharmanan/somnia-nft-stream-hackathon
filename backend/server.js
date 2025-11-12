@@ -2,12 +2,7 @@ import express from 'express';
 import { WebSocketServer } from 'ws';
 import { createServer } from 'http';
 import cors from 'cors';
-import path from 'path';
-import { fileURLToPath } from 'url';
 import { SDK, SchemaEncoder } from '@somnia-chain/streams';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 const app = express();
 const server = createServer(app);
@@ -28,10 +23,6 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 app.use(express.json());
-
-// Serve static files from dist (built frontend)
-const distPath = path.join(__dirname, '..', 'dist');
-app.use(express.static(distPath));
 
 // Define supported event schemas for schema-based filtering
 const SUPPORTED_SCHEMAS = {
@@ -461,11 +452,6 @@ app.get('/api/metamask-config', (req, res) => {
     rpcUrls: ['https://dream-rpc.somnia.network/'],
     blockExplorerUrls: ['https://shannon-explorer.somnia.network/']
   });
-});
-
-// SPA fallback - serve index.html for all unmatched routes
-app.get('*', (req, res) => {
-  res.sendFile(path.join(distPath, 'index.html'));
 });
 
 // Initialize and start server

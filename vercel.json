@@ -3,7 +3,17 @@
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
   "framework": "vite",
+  "env": {
+    "VITE_BACKEND_URL": "@backend_url"
+  },
   "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "https://$BACKEND_URL/api/$1",
+      "headers": {
+        "Access-Control-Allow-Origin": "*"
+      }
+    },
     {
       "src": "/assets/(.*)",
       "dest": "/dist/assets/$1",
