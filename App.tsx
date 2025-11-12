@@ -299,6 +299,9 @@ const App: React.FC = () => {
   const connectWallet = async () => {
     console.log('🔗 Connecting to wallet...');
     console.log('Wallet available:', !!window.ethereum);
+    
+    // Clear force disconnect marker
+    sessionStorage.removeItem('forceDisconnect');
 
     if (!isWalletInstalled()) {
       // Show error with WalletConnect option
@@ -394,6 +397,9 @@ const App: React.FC = () => {
   const disconnectWallet = () => {
     console.log('🔌 Disconnecting wallet...');
     
+    // Mark disconnect in session to prevent auto-reconnect
+    sessionStorage.setItem('forceDisconnect', 'true');
+    
     // Remove all listeners FIRST
     if (window.ethereum) {
       try {
@@ -416,15 +422,26 @@ const App: React.FC = () => {
     console.log('✅ Wallet state cleared');
     
     setToast({
-      message: '✅ Wallet disconnected. You can now connect a different wallet.',
+      message: '✅ Wallet disconnected. Refresh page to connect new wallet.',
       type: 'success'
     });
-    setTimeout(() => setToast(null), 3000);
+    
+    // Force page reload after 1 second to clear any lingering state
+    setTimeout(() => {
+      window.location.reload();
+    }, 1000);
   };
 
   // Listen for account changes - only when user explicitly switches account in wallet
   useEffect(() => {
     if (!window.ethereum) return;
+    
+    // Check if we're forcing disconnect
+    const forceDisconnect = sessionStorage.getItem('forceDisconnect') === 'true';
+    if (forceDisconnect) {
+      console.log('⚠️ Force disconnect active, skipping listener setup');
+      return;
+    }
 
     const handleAccountsChanged = (accounts: string[]) => {
       console.log('👛 Accounts changed in wallet:', accounts);

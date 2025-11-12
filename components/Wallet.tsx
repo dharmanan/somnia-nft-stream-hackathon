@@ -51,14 +51,6 @@ export const Wallet: React.FC<WalletProps> = ({
                 <span className="text-xs text-indigo-300 font-semibold">{networkName}</span>
             </div>
             <Button 
-                variant="secondary"
-                onClick={onConnect}
-                className="py-2 px-3 text-xs"
-                title="Switch to different wallet"
-            >
-                <span>Switch</span>
-            </Button>
-            <Button 
                 variant="danger"
                 onClick={onDisconnect}
                 className="py-2 px-3 text-xs"
