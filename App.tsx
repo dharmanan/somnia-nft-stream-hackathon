@@ -384,6 +384,20 @@ const App: React.FC = () => {
     }
   };
 
+  // Disconnect wallet
+  const disconnectWallet = () => {
+    console.log('🔌 Disconnecting wallet...');
+    setAccount('');
+    setIsConnected(false);
+    setNetworkName('');
+    setError('');
+    setToast({
+      message: '✅ Wallet disconnected. You can now connect a different wallet.',
+      type: 'success'
+    });
+    setTimeout(() => setToast(null), 3000);
+  };
+
   // Listen for account changes
   useEffect(() => {
     if (window.ethereum) {
@@ -589,6 +603,7 @@ const App: React.FC = () => {
           isConnecting={isConnecting}
           networkName={networkName}
           onConnectWallet={connectWallet}
+          onDisconnectWallet={disconnectWallet}
         />
 
         {error && (

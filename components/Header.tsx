@@ -15,7 +15,8 @@ export const Header: React.FC<{
   isConnecting: boolean;
   networkName: string;
   onConnectWallet: () => void;
-}> = ({ account, isConnected, isConnecting, networkName, onConnectWallet }) => {
+  onDisconnectWallet?: () => void;
+}> = ({ account, isConnected, isConnecting, networkName, onConnectWallet, onDisconnectWallet }) => {
   return (
     <header className="flex items-center justify-between">
       <div className="flex items-center space-x-4">
@@ -34,6 +35,7 @@ export const Header: React.FC<{
         isConnecting={isConnecting}
         networkName={networkName}
         onConnect={onConnectWallet}
+        onDisconnect={onDisconnectWallet}
       />
     </header>
   );
