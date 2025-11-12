@@ -168,7 +168,7 @@ const App: React.FC = () => {
       const wsProtocol = isSecure ? 'wss' : 'ws';
       
       const backendUrl = isDevelopment
-        ? `${wsProtocol}://${window.location.hostname}:3000/ws`
+        ? `${wsProtocol}://localhost:3000/ws`
         : `${wsProtocol}://${import.meta.env.VITE_BACKEND_URL}/ws`;
       
       console.log(`🔌 Connecting to WebSocket: ${backendUrl} (Dev: ${isDevelopment}, Secure: ${isSecure})`);
