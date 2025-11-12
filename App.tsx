@@ -165,7 +165,7 @@ const App: React.FC = () => {
       // Determine WebSocket protocol and URL based on environment
       const isDevelopment = import.meta.env.DEV;
       const isSecure = typeof window !== 'undefined' && window.location.protocol === 'https:';
-      const wsProtocol = isDevelopment ? 'ws' : 'ws'; // Always use ws (not wss) for VPS
+      const wsProtocol = isSecure ? 'wss' : 'ws'; // Use wss for production (HTTPS), ws for dev
       
       const backendUrl = isDevelopment
         ? `${wsProtocol}://${window.location.hostname}:3000/ws`
