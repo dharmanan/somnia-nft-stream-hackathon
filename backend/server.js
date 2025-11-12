@@ -1,28 +1,15 @@
 import express from 'express';
 import { WebSocketServer } from 'ws';
-import { createServer } from 'https';
-import { readFileSync } from 'fs';
+import { createServer } from 'http';
 import cors from 'cors';
 import { SDK, SchemaEncoder } from '@somnia-chain/streams';
 
 const app = express();
-
-// Check if SSL certs exist, otherwise use HTTP
-let server;
-try {
-  const options = {
-    key: readFileSync('./key.pem'),
-    cert: readFileSync('./cert.pem')
-  };
-  server = createServer(options, app);
-  console.log('🔒 HTTPS/WSS enabled (SSL certificates found)');
-} catch (err) {
-  console.log('⚠️ SSL certificates not found, using HTTP/WS instead');
-  const { createServer: createHttpServer } = await import('http');
-  server = createHttpServer(app);
-}
-
+const server = createServer(app);
 const wss = new WebSocketServer({ server });
+
+app.use(cors());
+app.use(express.json());
 
 app.use(cors());
 app.use(express.json());
