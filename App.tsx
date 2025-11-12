@@ -48,6 +48,7 @@ const App: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string>('');
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null);
+  const [testSdsLoading, setTestSdsLoading] = useState(false);
   
   // MetaMask state
   const [account, setAccount] = useState<string>('');
@@ -560,7 +561,7 @@ const App: React.FC = () => {
                     {sdsLoading ? 'Loading...' : 'Refresh SDS Data'}
                   </Button>
                   <div className="space-y-2 max-h-32 overflow-y-auto">
-                    {sdsData.length > 0 ? (
+                    {sdsData && sdsData.length > 0 ? (
                       sdsData.map((event, index) => (
                         <div key={index} className="bg-black/20 p-2 rounded text-xs">
                           <div className="flex justify-between items-center mb-1">
@@ -569,10 +570,10 @@ const App: React.FC = () => {
                               event.eventType === 'AUCTION_STARTED' ? 'text-blue-400' :
                               'text-yellow-400'
                             }`}>
-                              {event.eventType.replace('_', ' ')}
+                              {event.eventType ? event.eventType.replace('_', ' ') : 'Event'}
                             </span>
                             <span className="text-gray-400">
-                              {new Date(event.timestamp).toLocaleTimeString()}
+                              {event.timestamp ? new Date(event.timestamp).toLocaleTimeString() : 'N/A'}
                             </span>
                           </div>
                           {event.bidder && (
@@ -698,9 +699,14 @@ const App: React.FC = () => {
             <div className="space-y-4">
               <Button 
                 fullWidth 
+                disabled={testSdsLoading}
                 onClick={async () => {
+                  if (testSdsLoading) return; // Prevent multiple rapid clicks
+                  
                   try {
+                    setTestSdsLoading(true);
                     setToast({ message: '📡 Testing SDS streaming...', type: 'info' });
+                    
                     // Test SDS by publishing a demo event
                     const response = await fetch('/api/sds/publish-event', {
                       method: 'POST',
@@ -725,10 +731,13 @@ const App: React.FC = () => {
                   } catch (err) {
                     setToast({ message: '📡 SDS test initiated', type: 'info' });
                     setTimeout(() => setToast(null), 2000);
+                  } finally {
+                    // Cooldown: disable button for 2 seconds to prevent spam
+                    setTimeout(() => setTestSdsLoading(false), 2000);
                   }
                 }}
               >
-                Test SDS Streaming
+                {testSdsLoading ? 'Testing...' : 'Test SDS Streaming'}
               </Button>
               <div className="flex items-center space-x-2">
                 <span className="relative flex h-3 w-3">
