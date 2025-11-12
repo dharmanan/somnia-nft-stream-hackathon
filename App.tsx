@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { flushSync } from 'react-dom';
 import { Header } from './components/Header';
 import { Footer } from './components/Footer';
 import { Card } from './components/Card';
@@ -339,8 +340,13 @@ const App: React.FC = () => {
       console.log('📊 Current chain ID (decimal):', chainId);
       console.log('Expected chain ID (decimal):', parseInt(SOMNIA_CHAIN.chainId, 16));
       
-      setIsConnected(true);
-      setNetworkName(chainId === parseInt(SOMNIA_CHAIN.chainId, 16) ? 'Somnia Testnet' : 'Different Network');
+      // Set state synchronously to ensure UI updates immediately
+      flushSync(() => {
+        setAccount(account);
+        setIsConnected(true);
+        setNetworkName(chainId === parseInt(SOMNIA_CHAIN.chainId, 16) ? 'Somnia Testnet' : 'Different Network');
+      });
+      
       console.log('🎉 Wallet connection successful!');
 
     } catch (err: any) {
@@ -392,17 +398,22 @@ const App: React.FC = () => {
     if (window.ethereum) {
       try {
         window.ethereum.removeAllListeners?.();
+        console.log('✅ Removed all listeners');
       } catch (e) {
         console.log('Could not remove all listeners:', e);
       }
     }
     
-    // Clear all wallet state
-    setAccount('');
-    setIsConnected(false);
-    setIsConnecting(false);
-    setNetworkName('');
-    setError('');
+    // Synchronously clear all wallet state using flushSync
+    flushSync(() => {
+      setAccount('');
+      setIsConnected(false);
+      setIsConnecting(false);
+      setNetworkName('');
+      setError('');
+    });
+    
+    console.log('✅ Wallet state cleared');
     
     setToast({
       message: '✅ Wallet disconnected. You can now connect a different wallet.',
