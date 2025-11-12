@@ -164,12 +164,14 @@ const App: React.FC = () => {
 
       // Determine WebSocket URL based on environment
       const isDevelopment = import.meta.env.DEV;
+      const isSecure = typeof window !== 'undefined' && window.location.protocol === 'https:';
+      const wsProtocol = isSecure ? 'wss' : 'ws';
       
       const backendUrl = isDevelopment
-        ? `ws://${window.location.hostname}:3000/ws`
-        : `ws://${import.meta.env.VITE_BACKEND_URL}/ws`;
+        ? `${wsProtocol}://${window.location.hostname}:3000/ws`
+        : `${wsProtocol}://${import.meta.env.VITE_BACKEND_URL}/ws`;
       
-      console.log(`🔌 Connecting to WebSocket: ${backendUrl} (Dev: ${isDevelopment})`);
+      console.log(`🔌 Connecting to WebSocket: ${backendUrl} (Dev: ${isDevelopment}, Secure: ${isSecure})`);
       const websocket = new WebSocket(backendUrl);
 
       websocket.onopen = () => {
