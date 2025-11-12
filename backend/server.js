@@ -261,7 +261,7 @@ app.post('/api/sds/publish-event', (req, res) => {
 app.get('/api/auction/status', (req, res) => {
   res.json({
     auctionStarted: true,
-    highestBid: '0.5',
+    highestBid: '0.0143',
     highestBidder: '0x1234567890123456789012345678901234567890',
     endTime: Math.floor(Date.now() / 1000) + 3600,
     nftContract: '0x6c5cE10cD5dcE7250f5dF94599Ec6869158E966f',

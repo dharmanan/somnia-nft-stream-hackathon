@@ -367,7 +367,7 @@ const App: React.FC = () => {
       // Check if bid is higher than current highest bid
       const currentHighestBid = await auctionContract.highestBid();
       if (bidAmountWei <= currentHighestBid) {
-        const minBid = ethers.formatEther(currentHighestBid) + 0.0001;
+        const minBid = '0.0143';
         setError(`Bid must be higher than current highest bid. Minimum: ${minBid} STT`);
         return;
       }
