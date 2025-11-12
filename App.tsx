@@ -182,7 +182,7 @@ const App: React.FC = () => {
     if (typeof window === 'undefined') return false;
     
     // Check for window.ethereum (MetaMask, Brave, Opera)
-    if (window.ethereum) return true;
+    if ((window as any).ethereum) return true;
     
     // Check for WalletConnect
     if ((window as any).walletconnect) return true;
