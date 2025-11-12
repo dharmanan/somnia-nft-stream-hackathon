@@ -556,6 +556,14 @@ const App: React.FC = () => {
       setSdsData(prevData => [newBid, ...prevData]);
       console.log('📡 Added bid to local SDS Data:', newBid);
       
+      // Also update bids history and last bid for UI sections
+      const bidHistoryItem = {
+        address: account,
+        amount: parseFloat(bidAmount)
+      };
+      setBids(prev => [bidHistoryItem, ...prev.slice(0, 49)]);
+      setLastBid(bidHistoryItem);
+      
       // Trigger animation for new bid
       setNewBidIndex(0);
       
