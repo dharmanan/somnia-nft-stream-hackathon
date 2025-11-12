@@ -109,15 +109,16 @@ const App: React.FC = () => {
   // WebSocket connection for real-time SDS subscription
   useEffect(() => {
     const connectWebSocket = () => {
-      // In development, force ws://localhost:3000
-      // In production, use wss:// secure connection
+      // Determine WebSocket protocol and URL based on environment
       const isDevelopment = import.meta.env.DEV;
+      const isSecure = typeof window !== 'undefined' && window.location.protocol === 'https:';
+      const wsProtocol = isSecure ? 'wss' : 'ws';
       
       const backendUrl = isDevelopment
-        ? 'ws://localhost:3000' 
-        : 'wss://backend-4hyellmsz-kohens-projects.vercel.app';
+        ? `${wsProtocol}://${window.location.hostname}:${window.location.port}/ws`
+        : `${wsProtocol}://backend-4hyellmsz-kohens-projects.vercel.app`;
       
-      console.log(`🔌 Connecting to WebSocket: ${backendUrl} (Dev: ${isDevelopment})`);
+      console.log(`🔌 Connecting to WebSocket: ${backendUrl} (Dev: ${isDevelopment}, Secure: ${isSecure})`);
       const websocket = new WebSocket(backendUrl);
 
       websocket.onopen = () => {

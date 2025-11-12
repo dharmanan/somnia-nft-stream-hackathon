@@ -14,6 +14,11 @@ export default defineConfig(({ mode }) => {
             changeOrigin: true,
             secure: false,
           },
+          '/ws': {
+            target: 'ws://localhost:3000',
+            ws: true,
+            changeOrigin: true,
+          },
         },
       },
       plugins: [react()],
