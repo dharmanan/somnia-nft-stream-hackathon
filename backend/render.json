@@ -1,0 +1,12 @@
+{
+  "name": "somnia-nft-stream-backend",
+  "description": "Somnia NFT Stream Backend with Real-time WebSocket",
+  "buildCommand": "npm install",
+  "startCommand": "npm start",
+  "env": [
+    {
+      "key": "NODE_ENV",
+      "value": "production"
+    }
+  ]
+}
