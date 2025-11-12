@@ -59,7 +59,7 @@ SomniaStream leverages Somnia Data Streams (SDS) for real-time auction updates:
 
 ### ✅ Production-Ready Smart Contracts
 - Solidity smart contracts deployed on Somnia Testnet
-- OpenZeppelin standards (ERC721, ReentrancyGuard)
+- OpenZeppelin standards (ERC721, ReentrancyGuard) in deployed contracts
 - Security audited with best practices
 - Event-driven architecture for real-time updates
 
@@ -157,8 +157,13 @@ When a new bid is detected:
 
 ### Smart Contracts
 - **Solidity** 0.8.20 - Smart contract language
-- **OpenZeppelin** v5.4.0 - Security standards
-- **ReentrancyGuard** - Security protection
+- **OpenZeppelin** v5.4.0 - Security standards and audited libraries
+- **ReentrancyGuard** - Protection against reentrancy attacks
+- **Pre-deployed on Somnia Testnet** - Auction and NFT contracts ready
+
+**Note:** Smart contract source code and deployment scripts are maintained in the [companion contracts repository](https://github.com/). The auction contract is deployed at:
+- **Auction Contract:** `0x811CD7090a8e7b63ee466A7610d7e28Ba0cda6ef`
+- **NFT Contract:** `0x6c5cE10cD5dcE7250f5dF94599Ec6869158E966f`
 
 ### Blockchain
 - **Somnia Testnet (Shannon)** - Official test network
@@ -241,7 +246,7 @@ AUCTION_SCHEMAS = {
 - **Input Validation** - All user inputs validated
 - **Error Handling** - Comprehensive error management
 - **Type Safety** - TypeScript-inspired patterns
-- **Audit-Ready** - OpenZeppelin security standards
+- **Audit-Ready** - OpenZeppelin security standards in deployed contracts
 
 ## 🎯 Hackathon Compliance
 
