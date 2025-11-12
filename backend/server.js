@@ -10,15 +10,15 @@ const wss = new WebSocketServer({ server });
 
 // Configure CORS for Vercel frontend
 const corsOptions = {
-  origin: [
-    'http://localhost:3000',
-    'http://localhost:3001',
-    /vercel\.app$/,
-    /localhost/,
-    /.+/  // Allow all for now, restrict later
-  ],
-  methods: ['GET', 'POST', 'OPTIONS'],
-  credentials: true
+  origin: function(origin, callback) {
+    // Allow all origins for now
+    callback(null, true);
+  },
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  credentials: true,
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  preflightContinue: false,
+  optionsSuccessStatus: 200
 };
 
 app.use(cors(corsOptions));
