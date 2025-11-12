@@ -465,23 +465,35 @@ const App: React.FC = () => {
       // Update auction status
       await fetchAuctionStatus();
 
-      // Publish to SDS via WebSocket
+      const bidPayload = {
+        eventType: 'BID_PLACED',
+        auctionId: 'auction-001',
+        eventData: {
+          bidder: account,
+          bidAmount: bidAmount,
+          txHash: tx.hash,
+          blockNumber: receipt?.blockNumber
+        }
+      };
+
+      // Try WebSocket first
+      let publishedViaWS = false;
       if (ws && ws.readyState === WebSocket.OPEN) {
-        console.log('📡 Publishing bid to SDS via WebSocket...');
-        ws.send(JSON.stringify({
-          type: 'publish_auction_event',
-          eventType: 'BID_PLACED',
-          auctionId: 'auction-001',
-          eventData: {
-            bidder: account,
-            bidAmount: bidAmount,
-            txHash: tx.hash,
-            blockNumber: receipt?.blockNumber
-          }
-        }));
-      } else {
+        try {
+          console.log('📡 Publishing bid to SDS via WebSocket...');
+          ws.send(JSON.stringify({
+            type: 'publish_auction_event',
+            ...bidPayload
+          }));
+          publishedViaWS = true;
+        } catch (wsError) {
+          console.warn('⚠️ WebSocket send failed:', wsError);
+        }
+      }
+
+      // Always also try REST as backup
+      if (!publishedViaWS) {
         console.warn('⚠️ WebSocket not ready, using REST fallback...');
-        // Fallback to REST if WebSocket not available
         try {
           const backendUrl = import.meta.env.DEV 
             ? 'http://localhost:3001' 
@@ -490,16 +502,7 @@ const App: React.FC = () => {
           const response = await fetch(`${backendUrl}/api/sds/publish-event`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              eventType: 'BID_PLACED',
-              auctionId: 'auction-001',
-              data: {
-                bidder: account,
-                bidAmount: bidAmount,
-                txHash: tx.hash,
-                blockNumber: receipt?.blockNumber
-              }
-            })
+            body: JSON.stringify(bidPayload)
           });
           const result = await response.json();
           if (result.success) {
