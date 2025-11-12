@@ -536,6 +536,41 @@ const App: React.FC = () => {
     }
   };
 
+  // Test broadcast - sends test message to all WebSocket clients
+  const testBroadcast = async () => {
+    try {
+      setIsLoading(true);
+      console.log('🧪 Testing broadcast from backend...');
+      
+      const backendUrl = import.meta.env.DEV 
+        ? 'http://localhost:3001' 
+        : `https://${import.meta.env.VITE_BACKEND_URL || window.location.host}`;
+      
+      const response = await fetch(`${backendUrl}/api/test-broadcast`);
+      const data = await response.json();
+      
+      console.log('✅ Test response received:', data);
+      console.log(`📊 Backend reports ${data.broadcastSuccess} clients received message`);
+      console.log('📊 Connected clients:', data.connectedClients);
+      
+      setToast({
+        message: `✅ Test broadcast sent! ${data.broadcastSuccess} clients should receive message`,
+        type: 'success'
+      });
+      
+      setTimeout(() => setToast(null), 3000);
+    } catch (error) {
+      console.error('❌ Test broadcast failed:', error);
+      setToast({
+        message: '❌ Test broadcast failed - check console',
+        type: 'error'
+      });
+      setTimeout(() => setToast(null), 3000);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen text-white font-sans flex flex-col">
       <style dangerouslySetInnerHTML={{ __html: styles }} />
@@ -767,6 +802,31 @@ const App: React.FC = () => {
             <p className="text-xs text-gray-400 mt-2">
               {auctionStatus ? `Min bid: ${(parseFloat(auctionStatus.highestBid) + 0.0001).toFixed(4)} STT` : 'Loading minimum bid...'}
             </p>
+          </Card>
+
+          {/* DEBUG: Test Broadcast Button */}
+          <Card title="🧪 Debug: Test WebSocket Broadcast" icon={<Icon name="test" />}>
+            <div className="space-y-3">
+              <p className="text-xs text-gray-400 mb-3">
+                Click to test if backend can broadcast messages to connected clients via WebSocket
+              </p>
+              <Button 
+                variant="warning"
+                fullWidth
+                onClick={testBroadcast}
+                disabled={isLoading}
+              >
+                {isLoading ? 'Testing...' : '🧪 Send Test Broadcast'}
+              </Button>
+              <div className="bg-black/30 p-2 rounded text-xs text-gray-300 border border-yellow-500/30">
+                <p className="font-semibold mb-1">Expected behavior:</p>
+                <ul className="list-disc list-inside space-y-1">
+                  <li>Toast shows "✅ Test broadcast sent"</li>
+                  <li>Console shows "📡 Test broadcast sent to X connected clients"</li>
+                  <li>SDS Data section updates with test message</li>
+                </ul>
+              </div>
+            </div>
           </Card>
 
           <Card title="Auction Status" icon={<Icon name="status" />} className="lg:row-span-2 flex flex-col">

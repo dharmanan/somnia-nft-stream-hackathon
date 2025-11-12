@@ -485,6 +485,40 @@ app.get('/api/metamask-config', (req, res) => {
   });
 });
 
+// Test endpoint - broadcast test message to all connected WebSocket clients
+app.get('/api/test-broadcast', (req, res) => {
+  const testMessage = {
+    type: 'auction_event',
+    data: {
+      bidder: '0xTestAddress123',
+      bidAmount: '999.99',
+      auctionId: 'auction-001',
+      txHash: '0xtest123',
+      blockNumber: 12345,
+      timestamp: Date.now(),
+      message: '🧪 TEST MESSAGE - If you see this, WebSocket broadcast works!'
+    }
+  };
+
+  let broadcastCount = 0;
+  wss.clients.forEach(client => {
+    if (client.readyState === 1) { // OPEN
+      client.send(JSON.stringify(testMessage));
+      broadcastCount++;
+    }
+  });
+
+  console.log(`📡 Test broadcast sent to ${broadcastCount} connected clients`);
+
+  res.json({
+    status: 'success',
+    message: 'Test broadcast sent',
+    connectedClients: wss.clients.size,
+    broadcastSuccess: broadcastCount,
+    testData: testMessage
+  });
+});
+
 // Initialize and start server
 const PORT = process.env.PORT || 3001;
 initializeSDS().catch(err => {
