@@ -168,8 +168,8 @@ const App: React.FC = () => {
       const wsProtocol = isSecure ? 'wss' : 'ws';
       
       const backendUrl = isDevelopment
-        ? `${wsProtocol}://localhost:3000/ws`
-        : `${wsProtocol}://${import.meta.env.VITE_BACKEND_URL}/ws`;
+        ? `${wsProtocol}://localhost:3001`
+        : `${wsProtocol}://${import.meta.env.VITE_BACKEND_URL}`;
       
       console.log(`🔌 Connecting to WebSocket: ${backendUrl} (Dev: ${isDevelopment}, Secure: ${isSecure})`);
       const websocket = new WebSocket(backendUrl);
@@ -477,7 +477,11 @@ const App: React.FC = () => {
         console.warn('⚠️ WebSocket not ready, using REST fallback...');
         // Fallback to REST if WebSocket not available
         try {
-          const response = await fetch('/api/sds/publish-event', {
+          const backendUrl = import.meta.env.DEV 
+            ? 'http://localhost:3001' 
+            : import.meta.env.VITE_BACKEND_URL;
+          
+          const response = await fetch(`${backendUrl}/api/sds/publish-event`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({

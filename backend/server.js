@@ -446,13 +446,16 @@ app.get('/api/metamask-config', (req, res) => {
 
 // Initialize and start server
 const PORT = process.env.PORT || 3001;
-initializeSDS();
+initializeSDS().catch(err => {
+  console.error('SDS initialization failed, continuing without SDS:', err.message);
+  // Continue without SDS
+});
 server.listen(PORT, () => {
   console.log(`\n🚀 Somnia NFT Auction Backend Server`);
   console.log(`📍 Running on port ${PORT}`);
   console.log(`🔌 WebSocket: ws://localhost:${PORT}`);
   console.log(`📡 REST API: http://localhost:${PORT}/api`);
-  console.log(`✅ SDS Integration: Active (Subscription Model)\n`);
+  console.log(`✅ SDS Integration: Initializing...\n`);
 });
 
 export default app;
