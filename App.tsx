@@ -299,14 +299,6 @@ const App: React.FC = () => {
     console.log('🔗 Connecting to wallet...');
     console.log('Wallet available:', !!window.ethereum);
 
-    // Disconnect any previous connection first
-    if (isConnected) {
-      console.log('⚠️ Already connected, disconnecting previous connection...');
-      disconnectWallet();
-      // Wait a bit for disconnect to complete
-      await new Promise(resolve => setTimeout(resolve, 100));
-    }
-
     if (!isWalletInstalled()) {
       // Show error with WalletConnect option
       setError('No Web3 wallet detected. Please install MetaMask, Brave Wallet, or use WalletConnect at https://walletconnect.com/');
@@ -349,6 +341,10 @@ const App: React.FC = () => {
       
       setIsConnected(true);
       setNetworkName(chainId === parseInt(SOMNIA_CHAIN.chainId, 16) ? 'Somnia Testnet' : 'Different Network');
+      
+      // Clear disconnect marker
+      localStorage.removeItem('walletDisconnected');
+      
       console.log('🎉 Wallet connection successful!');
 
     } catch (err: any) {
@@ -395,8 +391,14 @@ const App: React.FC = () => {
   // Disconnect wallet
   const disconnectWallet = () => {
     console.log('🔌 Disconnecting wallet...');
+    
+    // Mark as disconnected in localStorage
+    localStorage.setItem('walletDisconnected', 'true');
+    
+    // Clear all wallet state synchronously
     setAccount('');
     setIsConnected(false);
+    setIsConnecting(false);
     setNetworkName('');
     setError('');
     
@@ -417,12 +419,16 @@ const App: React.FC = () => {
     if (window.ethereum && isConnected) {
       const handleAccountsChanged = (accounts: string[]) => {
         console.log('👛 Accounts changed:', accounts);
-        if (accounts.length > 0) {
+        // Check if user manually disconnected in wallet
+        const wasDisconnected = localStorage.getItem('walletDisconnected') === 'true';
+        if (accounts.length === 0 || wasDisconnected) {
+          // Disconnect if no accounts or user marked as disconnected
+          console.log('🔌 User disconnected from wallet or marked as disconnected');
+          disconnectWallet();
+        } else if (accounts.length > 0) {
+          // Update with new account
           setAccount(accounts[0]);
           setIsConnected(true);
-        } else {
-          // Disconnect if no accounts
-          disconnectWallet();
         }
       };
 
