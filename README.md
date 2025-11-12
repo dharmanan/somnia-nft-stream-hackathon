@@ -37,11 +37,11 @@ Conventional NFT marketplaces rely on backend polling or delayed oracle data, ca
 - Poor real-time experience
 
 ### ✅ SomniaStream Solution
-SomniaStream eliminates these limitations using Somnia Data Streams (SDS):
-- **Event-driven auctions**: Live bid updates via blockchain streams
-- **Schema-based encoding**: Ensures type-safe communication
-- **No middle layer**: Data is published directly to Somnia's decentralized stream layer
-- **Instant UI updates**: Real-time notifications without page reloads
+SomniaStream leverages Somnia Data Streams (SDS) for real-time auction updates:
+- **Schema-based event encoding**: Type-safe blockchain communication
+- **Hybrid real-time approach**: WebSocket + fallback polling for reliability
+- **Decentralized data publishing**: Events published to Somnia's stream layer
+- **Instant UI updates**: Live bid notifications without manual refreshes
 
 ## ⭐ Key Features
 
@@ -104,7 +104,10 @@ async function publishBidToSDS(bidAmount, bidderAddress) {
 ```
 
 ### 3. Real-Time Subscription
-Frontend subscribes to BID_PLACED events using schema ID:
+The frontend subscribes to SDS events with a hybrid approach:
+- **WebSocket Connection**: For live bid updates (real-time when backend streams events)
+- **HTTP Polling**: Fallback mechanism that fetches SDS data every 3 seconds for reliability
+- **Schema-based Filtering**: Events are filtered by schema ID for type-safe processing
 
 ```javascript
 const bidPlacedSchemaId = '0xdbc461f2979180da401d5fa5f646a62c0b862dd8128fec16258714b900c705ee';

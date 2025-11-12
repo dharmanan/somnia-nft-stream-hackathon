@@ -106,14 +106,7 @@ const App: React.FC = () => {
     }
   };
 
-  // Auto-refresh SDS data every 3 seconds
-  useEffect(() => {
-    fetchSdsData(); // Fetch immediately
-    const interval = setInterval(fetchSdsData, 3000);
-    return () => clearInterval(interval);
-  }, []);
-
-  // WebSocket connection for real-time updates
+  // WebSocket connection for real-time SDS subscription
   useEffect(() => {
     const connectWebSocket = () => {
       // Detect environment and use appropriate backend URL
@@ -124,15 +117,25 @@ const App: React.FC = () => {
       const websocket = new WebSocket(backendUrl);
 
       websocket.onopen = () => {
-        console.log('🔌 Connected to WebSocket for real-time SDS updates');
+        console.log('🔌 Connected to SDS WebSocket for real-time subscriptions');
         setWs(websocket);
+        
+        // Subscribe to BID_PLACED events via SDS
+        websocket.send(JSON.stringify({
+          type: 'subscribe_sds',
+          eventType: 'BID_PLACED',
+          auctionId: 'auction-001'
+        }));
+        console.log('📡 SDS subscription initiated for BID_PLACED events');
       };
 
       websocket.onmessage = (event) => {
         try {
           const data = JSON.parse(event.data);
+          
+          // Handle SDS auction events
           if (data.type === 'auction_event' && data.eventType === 'BID_PLACED') {
-            console.log('📡 Real-time bid received via SDS:', data);
+            console.log('📡 Real-time bid received via SDS subscription:', data);
             // Update bid history and last bid from WebSocket
             const newBid = {
               address: `${data.data.bidder.slice(0, 6)}...${data.data.bidder.slice(-4)}`,
@@ -140,8 +143,15 @@ const App: React.FC = () => {
             };
             setBids(prev => [newBid, ...prev.slice(0, 9)]);
             setLastBid(newBid);
+            setSdsData(prev => [data, ...prev.slice(0, 19)]);
             // Refresh auction status
             fetchAuctionStatus();
+            
+          } else if (data.type === 'sds_subscription_confirmed') {
+            console.log('✅ SDS subscription confirmed:', data.subscriptionId);
+            
+          } else if (data.type === 'sds_heartbeat') {
+            console.log('💓 SDS connection heartbeat - stream active');
           }
         } catch (error) {
           console.error('WebSocket message error:', error);
@@ -149,7 +159,7 @@ const App: React.FC = () => {
       };
 
       websocket.onclose = () => {
-        console.log('🔌 WebSocket disconnected, reconnecting...');
+        console.log('🔌 SDS WebSocket disconnected, reconnecting...');
         setTimeout(connectWebSocket, 3000);
       };
 
