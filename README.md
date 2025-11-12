@@ -27,6 +27,22 @@ This project demonstrates the power of Somnia Data Streams (SDS) by creating a f
 - Schema-based data encoding ensures type-safe blockchain communication
 - Decentralized architecture maintains transparency and security
 
+## 🚀 Problem & Solution
+
+### ❌ Traditional NFT Auctions
+Conventional NFT marketplaces rely on backend polling or delayed oracle data, causing:
+- Slow UI refreshes
+- Missed events
+- Centralized intermediaries
+- Poor real-time experience
+
+### ✅ SomniaStream Solution
+SomniaStream eliminates these limitations using Somnia Data Streams (SDS):
+- **Event-driven auctions**: Live bid updates via blockchain streams
+- **Schema-based encoding**: Ensures type-safe communication
+- **No middle layer**: Data is published directly to Somnia's decentralized stream layer
+- **Instant UI updates**: Real-time notifications without page reloads
+
 ## ⭐ Key Features
 
 ### ✅ Somnia Data Streams Integration
