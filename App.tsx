@@ -541,6 +541,21 @@ const App: React.FC = () => {
       console.log('✅ Bid placed successfully! Transaction:', tx.hash);
       setLastTxHash(tx.hash);
       
+      // Add bid to SDS Data directly (since WebSocket broadcast may not work)
+      const newBid = {
+        eventType: 'BID_PLACED',
+        auctionId: 'auction-001',
+        bidder: account,
+        bidAmount: bidAmount,
+        txHash: tx.hash,
+        blockNumber: receipt?.blockNumber,
+        timestamp: Date.now(),
+        source: 'direct_from_blockchain'
+      };
+      
+      setSdsData(prevData => [newBid, ...prevData]);
+      console.log('📡 Added bid to local SDS Data:', newBid);
+      
       // Trigger animation for new bid
       setNewBidIndex(0);
       
