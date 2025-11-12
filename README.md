@@ -287,6 +287,8 @@ This project was built for the Somnia Data Streams Mini Hackathon. For improveme
 
 This project is open source and available under the MIT License.
 
+---
+
 ## 🙏 Acknowledgments
 
 - **Somnia Network** - For the innovative blockchain platform
