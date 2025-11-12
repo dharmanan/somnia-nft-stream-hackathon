@@ -160,7 +160,10 @@ wss.on('connection', (ws) => {
         // Broadcast auction event to all subscribed clients via SDS
         const { eventType, auctionId, eventData } = data;
         
-        console.log(`📡 Broadcasting ${eventType} to all SDS subscribers`);
+        console.log(`📡 Publishing ${eventType} event via WebSocket...`);
+        console.log(`   Bidder: ${eventData?.bidder?.slice(0, 10)}...`);
+        console.log(`   Amount: ${eventData?.bidAmount}`);
+        console.log(`   TX: ${eventData?.txHash?.slice(0, 10)}...`);
         
         const sdsEvent = {
           type: 'auction_event',
@@ -172,11 +175,15 @@ wss.on('connection', (ws) => {
         };
 
         // Send to all connected clients subscribed to this event type
+        let sentCount = 0;
         connectedClients.forEach(client => {
           if (client.readyState === 1) {
             client.send(JSON.stringify(sdsEvent));
+            sentCount++;
           }
         });
+        
+        console.log(`✅ Event broadcasted to ${sentCount} WebSocket client(s)`);
 
         ws.send(JSON.stringify({
           type: 'event_published',
