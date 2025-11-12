@@ -267,7 +267,7 @@ This project fully complies with Somnia Data Streams Mini Hackathon requirements
 
 ## 🎨 Demo Flow
 
-1. **Launch Application** - npm start → http://localhost:3000
+1. **Launch Application** - npm run dev → http://localhost:3000
 2. **Connect Wallet** - MetaMask integration with auto network switch
 3. **Load SDS Schemas** - View available event schemas
 4. **Monitor Auction** - Live status updates
@@ -276,12 +276,12 @@ This project fully complies with Somnia Data Streams Mini Hackathon requirements
 
 ## 🤝 Contributing
 
-This project was built for the Somnia Hackathon. For improvements or questions:
+This project was built for the Somnia Data Streams Mini Hackathon. For improvements or questions:
 
 - Fork the repository
 - Create a feature branch
-- Submit a pull request
-- Join the discussion on Discord
+- Submit a pull request with detailed description
+- Join the discussion on Somnia Discord community
 
 ## 📄 License
 
