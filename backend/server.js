@@ -13,7 +13,20 @@ const app = express();
 const server = createServer(app);
 const wss = new WebSocketServer({ server });
 
-app.use(cors());
+// Configure CORS for Vercel frontend
+const corsOptions = {
+  origin: [
+    'http://localhost:3000',
+    'http://localhost:3001',
+    /vercel\.app$/,
+    /localhost/,
+    /.+/  // Allow all for now, restrict later
+  ],
+  methods: ['GET', 'POST', 'OPTIONS'],
+  credentials: true
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
 
 // Serve static files from dist (built frontend)
