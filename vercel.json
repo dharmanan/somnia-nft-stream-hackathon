@@ -6,7 +6,6 @@
   "env": {
     "VITE_BACKEND_URL": "@backend_url"
   },
-  "envPrefix": "VITE_",
   "functions": {
     "backend/**/*.js": {
       "runtime": "nodejs18.x"
