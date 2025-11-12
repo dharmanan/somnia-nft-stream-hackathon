@@ -240,19 +240,26 @@ app.post('/api/sds/publish-event', (req, res) => {
     source: 'sds_stream'
   };
 
-  console.log(`📡 Publishing ${eventType} event to SDS stream`);
+  console.log(`📡 Publishing ${eventType} event to SDS stream (Total connected clients: ${connectedClients.size})`);
 
-  // Broadcast to all WebSocket clients
+  // Broadcast to all WebSocket clients (only send once per client)
+  let sentCount = 0;
+  const sentSet = new Set();
+  
   connectedClients.forEach(client => {
-    if (client.readyState === 1) {
+    if (client.readyState === 1 && !sentSet.has(client)) {
       client.send(JSON.stringify(sdsEvent));
+      sentSet.add(client);
+      sentCount++;
     }
   });
+
+  console.log(`✅ Event sent to ${sentCount} client(s)`);
 
   res.json({
     success: true,
     message: `Event ${eventType} published to SDS stream`,
-    subscriberCount: connectedClients.size,
+    subscriberCount: sentCount,
     timestamp: new Date().toISOString()
   });
 });

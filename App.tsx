@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Header } from './components/Header';
 import { Footer } from './components/Footer';
 import { Card } from './components/Card';
@@ -60,6 +60,8 @@ const App: React.FC = () => {
   const [ws, setWs] = useState<WebSocket | null>(null);
   const [sdsData, setSdsData] = useState<any[]>([]);
   const [sdsLoading, setSdsLoading] = useState(false);
+  const wsRef = useRef<WebSocket | null>(null);
+  const wsConnectingRef = useRef(false);
 
   // Somnia testnet configuration
   const SOMNIA_CHAIN = {
@@ -153,6 +155,14 @@ const App: React.FC = () => {
   // WebSocket connection for real-time SDS subscription
   useEffect(() => {
     const connectWebSocket = () => {
+      // Prevent duplicate connection attempts
+      if (wsConnectingRef.current || wsRef.current?.readyState === WebSocket.OPEN) {
+        console.log('⚠️ WebSocket connection already in progress or connected');
+        return;
+      }
+
+      wsConnectingRef.current = true;
+
       // Determine WebSocket protocol and URL based on environment
       const isDevelopment = import.meta.env.DEV;
       const isSecure = typeof window !== 'undefined' && window.location.protocol === 'https:';
@@ -167,7 +177,9 @@ const App: React.FC = () => {
 
       websocket.onopen = () => {
         console.log('🔌 Connected to SDS WebSocket for real-time subscriptions');
+        wsRef.current = websocket;
         setWs(websocket);
+        wsConnectingRef.current = false;
         
         // Subscribe to BID_PLACED events via SDS
         websocket.send(JSON.stringify({
@@ -233,19 +245,24 @@ const App: React.FC = () => {
 
       websocket.onclose = () => {
         console.log('🔌 SDS WebSocket disconnected, reconnecting...');
+        wsConnectingRef.current = false;
+        wsRef.current = null;
         setTimeout(connectWebSocket, 3000);
       };
 
       websocket.onerror = (error) => {
         console.error('WebSocket error:', error);
+        wsConnectingRef.current = false;
       };
     };
 
     connectWebSocket();
 
     return () => {
-      if (ws) {
-        ws.close();
+      // Don't close the WebSocket on unmount in StrictMode - just clean up ref
+      // The connection will be reused on remount
+      if (wsRef.current?.readyState === WebSocket.OPEN) {
+        console.log('🧹 Cleanup: keeping WebSocket open for potential remount');
       }
     };
   }, []);
