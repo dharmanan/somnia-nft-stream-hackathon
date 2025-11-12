@@ -194,6 +194,11 @@ const App: React.FC = () => {
         try {
           const data = JSON.parse(event.data);
           
+          // Skip heartbeat messages
+          if (data.type === 'heartbeat') {
+            return;
+          }
+          
           // Handle SDS auction events
           if (data.type === 'auction_event' && data.eventType === 'BID_PLACED') {
             console.log('📡 Real-time bid received via SDS subscription:', data);
