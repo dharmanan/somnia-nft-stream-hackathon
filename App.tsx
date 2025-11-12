@@ -384,15 +384,8 @@ const App: React.FC = () => {
       // Update auction status
       await fetchAuctionStatus();
 
-      // Update bid history and last bid
-      const newBid = {
-        address: `${account.slice(0, 6)}...${account.slice(-4)}`,
-        amount: parseFloat(bidAmount)
-      };
-      setBids(prev => [newBid, ...prev.slice(0, 9)]); // Keep last 10 bids
-      setLastBid(newBid);
-
       // Publish to SDS and broadcast via WebSocket
+      // Note: Do NOT update bid history here - WebSocket handler will receive the broadcast and update it
       try {
         const response = await fetch('/api/sds/publish-event', {
           method: 'POST',
