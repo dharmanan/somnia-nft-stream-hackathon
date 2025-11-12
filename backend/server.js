@@ -1,19 +1,11 @@
 import express from 'express';
 import { WebSocketServer } from 'ws';
-import { createServer } from 'https';
-import { readFileSync } from 'fs';
+import { createServer } from 'http';
 import cors from 'cors';
 import { SDK, SchemaEncoder } from '@somnia-chain/streams';
 
 const app = express();
-
-// Load SSL certificates for HTTPS/WSS
-const options = {
-  key: readFileSync('./key.pem'),
-  cert: readFileSync('./cert.pem')
-};
-
-const server = createServer(options, app);
+const server = createServer(app);
 const wss = new WebSocketServer({ server });
 
 app.use(cors());
