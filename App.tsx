@@ -425,29 +425,45 @@ const App: React.FC = () => {
       // Update auction status
       await fetchAuctionStatus();
 
-      // Publish to SDS and broadcast via WebSocket
-      // Note: Do NOT update bid history here - WebSocket handler will receive the broadcast and update it
-      try {
-        const response = await fetch('/api/sds/publish-event', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            eventType: 'BID_PLACED',
-            auctionId: 'auction-001',
-            data: {
-              bidder: account,
-              bidAmount: bidAmount,
-              txHash: tx.hash,
-              blockNumber: receipt?.blockNumber
-            }
-          })
-        });
-        const result = await response.json();
-        if (result.success) {
-          console.log('✅ Bid published to SDS:', result);
+      // Publish to SDS via WebSocket
+      if (ws && ws.readyState === WebSocket.OPEN) {
+        console.log('📡 Publishing bid to SDS via WebSocket...');
+        ws.send(JSON.stringify({
+          type: 'publish_auction_event',
+          eventType: 'BID_PLACED',
+          auctionId: 'auction-001',
+          eventData: {
+            bidder: account,
+            bidAmount: bidAmount,
+            txHash: tx.hash,
+            blockNumber: receipt?.blockNumber
+          }
+        }));
+      } else {
+        console.warn('⚠️ WebSocket not ready, using REST fallback...');
+        // Fallback to REST if WebSocket not available
+        try {
+          const response = await fetch('/api/sds/publish-event', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              eventType: 'BID_PLACED',
+              auctionId: 'auction-001',
+              data: {
+                bidder: account,
+                bidAmount: bidAmount,
+                txHash: tx.hash,
+                blockNumber: receipt?.blockNumber
+              }
+            })
+          });
+          const result = await response.json();
+          if (result.success) {
+            console.log('✅ Bid published to SDS via REST:', result);
+          }
+        } catch (sdsError) {
+          console.warn('⚠️ SDS publish failed:', sdsError);
         }
-      } catch (sdsError) {
-        console.warn('⚠️ SDS publish failed:', sdsError);
       }
 
       // Show transaction hash without popup
