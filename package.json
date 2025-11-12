@@ -6,12 +6,17 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "start": "node server.js",
     "preview": "vite preview"
   },
   "dependencies": {
+    "@somnia-chain/streams": "^0.9.5",
+    "cors": "^2.8.5",
     "ethers": "^6.15.0",
+    "express": "^4.18.2",
     "react": "^19.2.0",
-    "react-dom": "^19.2.0"
+    "react-dom": "^19.2.0",
+    "ws": "^8.14.2"
   },
   "devDependencies": {
     "@types/node": "^22.14.0",
