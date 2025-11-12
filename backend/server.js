@@ -95,7 +95,7 @@ async function initializeSDS() {
 // Send periodic heartbeat to all connected clients
 function startHeartbeat() {
   setInterval(() => {
-    connectedClients.forEach(ws => {
+    wss.clients.forEach(ws => {
       if (ws.readyState === 1) { // WebSocket.OPEN
         ws.send(JSON.stringify({
           type: 'sds_heartbeat',
@@ -177,7 +177,7 @@ wss.on('connection', (ws) => {
 
         // Send to all connected clients subscribed to this event type
         let sentCount = 0;
-        connectedClients.forEach(client => {
+        wss.clients.forEach(client => {
           if (client.readyState === 1) {
             client.send(JSON.stringify(sdsEvent));
             sentCount++;
@@ -367,7 +367,7 @@ app.post('/api/sds/publish-event', async (req, res) => {
   let sentCount = 0;
   const sentSet = new Set();
   
-  connectedClients.forEach(client => {
+  wss.clients.forEach(client => {
     if (client.readyState === 1 && !sentSet.has(client)) {
       client.send(JSON.stringify(sdsEvent));
       sentSet.add(client);
