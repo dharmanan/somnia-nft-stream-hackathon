@@ -77,6 +77,28 @@ const App: React.FC = () => {
     blockExplorerUrls: ['https://shannon-explorer.somnia.network/'],
   };
 
+  // Check on mount if page was reloaded after disconnect - if so, reset everything
+  useEffect(() => {
+    const wasDisconnected = localStorage.getItem('wasDisconnected') === 'true';
+    if (wasDisconnected) {
+      console.log('🔄 Page reloaded after disconnect - clearing all state');
+      localStorage.removeItem('wasDisconnected');
+      
+      // Hard reset all state
+      flushSync(() => {
+        setAccount('');
+        setIsConnected(false);
+        setIsConnecting(false);
+        setNetworkName('');
+        setError('');
+        setBids([]);
+        setLastBid(null);
+        setSdsData([]);
+      });
+      console.log('✅ All state reset');
+    }
+  }, []);
+
   // Backend'den auction status'ü çek
   const fetchAuctionStatus = async () => {
     try {
@@ -394,8 +416,10 @@ const App: React.FC = () => {
   const disconnectWallet = () => {
     console.log('🔌 Disconnecting wallet - full reset...');
     
-    // Clear all storage
-    localStorage.clear();
+    // Set marker BEFORE clearing storage
+    localStorage.setItem('wasDisconnected', 'true');
+    
+    // Clear all other storage
     sessionStorage.clear();
     
     // Clear cookies
