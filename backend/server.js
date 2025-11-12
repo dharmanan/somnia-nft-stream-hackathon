@@ -8,41 +8,35 @@ const app = express();
 const server = createServer(app);
 const wss = new WebSocketServer({ server });
 
-// Configure CORS for Vercel frontend
-const corsOptions = {
-  origin: function(origin, callback) {
-    // Allow all origins for now
-    callback(null, true);
-  },
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  credentials: true,
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  preflightContinue: false,
-  optionsSuccessStatus: 200
-};
-
-// Middleware to allow credentials and set permissive CORS
+// CORS middleware MUST be first - before everything else
+// This is the ONLY place where we set CORS headers
 app.use((req, res, next) => {
-  const origin = req.headers.origin || req.headers.referer || '*';
+  // Remove any existing CORS headers from Railway proxy
+  res.removeHeader('Access-Control-Allow-Origin');
+  res.removeHeader('Access-Control-Allow-Credentials');
   
-  // Always set CORS headers FIRST, before anything else
-  res.setHeader('Access-Control-Allow-Origin', origin);
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, HEAD');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept');
-  res.setHeader('Access-Control-Max-Age', '86400');
+  // Get origin from request
+  const origin = req.headers.origin || req.headers['x-forwarded-for'] || req.connection.remoteAddress || '*';
   
-  // If it's a preflight request, respond immediately
+  // Set our own CORS headers - override everything else
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, HEAD, PATCH');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept, Origin');
+  res.setHeader('Access-Control-Max-Age', '3600');
+  
+  console.log(`[CORS] ${req.method} ${req.path} | Origin: ${origin}`);
+  
+  // Handle preflight
   if (req.method === 'OPTIONS') {
-    res.setHeader('Content-Type', 'application/json');
-    res.setHeader('Content-Length', '0');
-    return res.sendStatus(204);
+    res.statusCode = 204;
+    res.end();
+    return;
   }
   
   next();
 });
 
 app.use(express.json());
-app.use(cors(corsOptions));
 
 // Define supported event schemas for schema-based filtering
 const SUPPORTED_SCHEMAS = {

@@ -467,9 +467,20 @@ const App: React.FC = () => {
       const tx = await auctionContract.placeBid({ value: bidAmountWei });
       console.log('📝 Transaction sent:', tx.hash);
       
-      // Wait for transaction confirmation
-      const receipt = await tx.wait();
-      console.log('✅ Transaction confirmed:', receipt?.hash);
+      // Wait for transaction confirmation with timeout
+      let receipt = null;
+      try {
+        receipt = await Promise.race([
+          tx.wait(),
+          new Promise((_, reject) => 
+            setTimeout(() => reject(new Error('Receipt timeout')), 15000)
+          )
+        ]);
+        console.log('✅ Transaction confirmed:', receipt?.hash);
+      } catch (waitError) {
+        console.warn('⚠️ Receipt wait timeout, continuing with hash:', tx.hash);
+        receipt = { hash: tx.hash, blockNumber: null };
+      }
 
       // Update auction status
       await fetchAuctionStatus();
