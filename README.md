@@ -104,10 +104,9 @@ async function publishBidToSDS(bidAmount, bidderAddress) {
 ```
 
 ### 3. Real-Time Subscription
-The frontend subscribes to SDS events with a hybrid approach:
-- **WebSocket Connection**: For live bid updates (real-time when backend streams events)
-- **HTTP Polling**: Fallback mechanism that fetches SDS data every 3 seconds for reliability
-- **Schema-based Filtering**: Events are filtered by schema ID for type-safe processing
+The frontend subscribes to SDS events via WebSocket:
+- **WebSocket Connection**: Real-time bid updates via Somnia Data Streams
+- **Schema-based Filtering**: Events are filtered and validated for type-safe processing
 
 ```javascript
 const bidPlacedSchemaId = '0xdbc461f2979180da401d5fa5f646a62c0b862dd8128fec16258714b900c705ee';

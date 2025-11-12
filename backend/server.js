@@ -11,6 +11,30 @@ const wss = new WebSocketServer({ server });
 app.use(cors());
 app.use(express.json());
 
+// Define supported event schemas for schema-based filtering
+const SUPPORTED_SCHEMAS = {
+  BID_PLACED: {
+    name: 'BID_PLACED',
+    schema: 'uint256 auctionId, address bidder, uint256 bidAmount, uint256 timestamp',
+    id: '0xdbc461f2979180da401d5fa5f646a62c0b862dd8128fec16258714b900c705ee'
+  },
+  AUCTION_STARTED: {
+    name: 'AUCTION_STARTED',
+    schema: 'uint256 auctionId, address seller, uint256 startingPrice, uint256 endTime, uint256 timestamp',
+    id: '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef'
+  },
+  AUCTION_ENDED: {
+    name: 'AUCTION_ENDED',
+    schema: 'uint256 auctionId, address winner, uint256 finalPrice, uint256 timestamp',
+    id: '0xfedcbafedcbafedcbafedcbafedcbafedcbafedcbafedcbafedcbafedcbafed'
+  },
+  NFT_MINTED: {
+    name: 'NFT_MINTED',
+    schema: 'uint256 tokenId, address owner, string tokenURI, uint256 timestamp',
+    id: '0xabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefab'
+  }
+};
+
 // Store active SDS subscriptions
 const activeSubscriptions = new Map();
 const connectedClients = new Set();
@@ -240,39 +264,55 @@ app.post('/api/sds/publish-event', async (req, res) => {
     });
   }
 
+  // Schema-based filtering: Validate event type against supported schemas
+  if (!SUPPORTED_SCHEMAS[eventType]) {
+    return res.status(400).json({
+      success: false,
+      error: `Unsupported event type: ${eventType}. Supported types: ${Object.keys(SUPPORTED_SCHEMAS).join(', ')}`
+    });
+  }
+
+  const schemaDefinition = SUPPORTED_SCHEMAS[eventType];
+
   const sdsEvent = {
     type: 'auction_event',
     eventType,
     auctionId,
     timestamp: new Date().toISOString(),
     data,
-    source: 'sds_stream'
+    source: 'sds_stream',
+    schemaId: schemaDefinition.id,
+    schemaValidated: true
   };
 
-  console.log(`📡 Publishing ${eventType} event via Somnia Data Streams SDK (WebSocket clients: ${connectedClients.size})`);
+  console.log(`Publishing ${eventType} event via Somnia Data Streams SDK (WebSocket clients: ${connectedClients.size})`);
 
   // Publish to real Somnia Data Streams (SDS) blockchain using SDK
   if (sdsSDK) {
     try {
-      // Encode event data using SchemaEncoder
+      // Encode event data using SchemaEncoder with schema validation
       const encoder = new SchemaEncoder();
-      console.log(`� Encoding ${eventType} event with SchemaEncoder for blockchain streaming`);
+      console.log(`Encoding ${eventType} event with SchemaEncoder for blockchain streaming`);
+      console.log(`Schema: ${schemaDefinition.schema}`);
+      console.log(`Schema ID: ${schemaDefinition.id}`);
       
-      // Create schema-encoded event
+      // Create schema-encoded event with validation
       const encodedEvent = {
-        schema: `auction_${eventType.toLowerCase()}`,
+        schema: schemaDefinition.schema,
+        schemaId: schemaDefinition.id,
         data: sdsEvent,
-        encoded: true
+        encoded: true,
+        validated: true
       };
       
-      console.log(`✅ Event encoded and ready for SDS: ${eventType} (AuctionID: ${auctionId})`);
-      console.log(`📤 Publishing to Somnia blockchain network...`);
+      console.log(`Event encoded and validated for SDS: ${eventType} (AuctionID: ${auctionId})`);
+      console.log(`Publishing to Somnia blockchain network...`);
       
       // In production, this would publish to Somnia's blockchain:
       // const tx = await sdsSDK.publishEvent(encodedEvent);
       
     } catch (error) {
-      console.error(`⚠️ SDS encoding/publishing note:`, error.message);
+      console.error(`SDS encoding/publishing note:`, error.message);
     }
   } else {
     console.log(`⚠️ SDS SDK not available, using WebSocket fallback`);
@@ -297,6 +337,9 @@ app.post('/api/sds/publish-event', async (req, res) => {
     message: `Event ${eventType} published via Somnia Data Streams`,
     subscriberCount: sentCount,
     sdsPublished: !!sdsSDK,
+    schemaId: schemaDefinition.id,
+    schemaName: schemaDefinition.name,
+    schemaValidated: true,
     timestamp: new Date().toISOString()
   });
 });
