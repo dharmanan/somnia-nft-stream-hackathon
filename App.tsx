@@ -565,17 +565,37 @@ const App: React.FC = () => {
         ? 'http://localhost:3001' 
         : `https://${import.meta.env.VITE_BACKEND_URL || window.location.host}`;
       
-      const response = await fetch(`${backendUrl}/api/test-broadcast`);
-      const data = await response.json();
-      
-      console.log('✅ Test response received:', data);
-      console.log(`📊 Backend reports ${data.broadcastSuccess} clients received message`);
-      console.log('📊 Connected clients:', data.connectedClients);
-      
-      setToast({
-        message: `✅ Test broadcast sent! ${data.broadcastSuccess} clients should receive message`,
-        type: 'success'
-      });
+      // Try fetch first
+      try {
+        const response = await fetch(`${backendUrl}/api/test-broadcast`);
+        const data = await response.json();
+        
+        console.log('✅ Test response received:', data);
+        console.log(`📊 Backend reports ${data.broadcastSuccess} clients received message`);
+        console.log('📊 Connected clients:', data.connectedClients);
+        
+        setToast({
+          message: `✅ Test broadcast sent! ${data.broadcastSuccess} clients should receive message`,
+          type: 'success'
+        });
+      } catch (fetchError) {
+        console.warn('⚠️ XHR failed (CORS?), trying img tag bypass...');
+        
+        // Fallback: use img tag to bypass CORS
+        const img = new Image();
+        img.onload = () => {
+          console.log('✅ IMG tag request succeeded - test broadcast sent!');
+          setToast({
+            message: '✅ Test broadcast sent via img tag!',
+            type: 'success'
+          });
+        };
+        img.onerror = () => {
+          console.error('❌ IMG tag also failed');
+          throw fetchError;
+        };
+        img.src = `${backendUrl}/api/test-broadcast-img?t=${Date.now()}`;
+      }
       
       setTimeout(() => setToast(null), 3000);
     } catch (error) {

@@ -1,0 +1,19 @@
+{
+  admin off
+}
+
+:8080 {
+  # Disable default CORS - let Express handle it
+  reverse_proxy localhost:3001 {
+    header_up -Access-Control-Allow-Origin
+    header_up -Access-Control-Allow-Methods
+    header_up -Access-Control-Allow-Headers
+    header_up -Access-Control-Allow-Credentials
+    
+    # Pass through all headers from Express
+    header_down +Access-Control-Allow-Origin "*"
+    header_down +Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS, HEAD, PATCH"
+    header_down +Access-Control-Allow-Headers "Content-Type, Authorization, X-Requested-With, Accept, Origin"
+    header_down +Access-Control-Max-Age "3600"
+  }
+}

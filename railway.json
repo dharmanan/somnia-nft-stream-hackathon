@@ -8,5 +8,8 @@
     "startCommand": "cd backend && npm start",
     "restartPolicyMaxRetries": 5,
     "restartPolicyWindowMs": 60000
-  }
+  },
+  "plugins": [
+    "nixpacks"
+  ]
 }

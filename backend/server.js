@@ -520,6 +520,46 @@ app.get('/api/test-broadcast', (req, res) => {
   });
 });
 
+// Alternative endpoint with CORS bypass - use image tag instead of XHR
+app.get('/api/test-broadcast-img', (req, res) => {
+  const testMessage = {
+    type: 'auction_event',
+    data: {
+      bidder: '0xTestAddress123',
+      bidAmount: '999.99',
+      auctionId: 'auction-001',
+      txHash: '0xtest123',
+      blockNumber: 12345,
+      timestamp: Date.now(),
+      message: '🧪 TEST MESSAGE (via img) - If you see this, WebSocket broadcast works!'
+    }
+  };
+
+  let broadcastCount = 0;
+  wss.clients.forEach(client => {
+    if (client.readyState === 1) { // OPEN
+      client.send(JSON.stringify(testMessage));
+      broadcastCount++;
+    }
+  });
+
+  // Return 1x1 pixel to allow img tag (bypasses CORS)
+  const png = Buffer.from([
+    0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0x00, 0x00, 0x00, 0x0d,
+    0x49, 0x48, 0x44, 0x52, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01,
+    0x08, 0x02, 0x00, 0x00, 0x00, 0x90, 0x77, 0x53, 0xde, 0x00, 0x00, 0x00,
+    0x0c, 0x49, 0x44, 0x41, 0x54, 0x08, 0x99, 0x63, 0xf8, 0xcf, 0xc0, 0x00,
+    0x00, 0x03, 0x01, 0x01, 0x00, 0x18, 0xdd, 0x8d, 0xb4, 0x00, 0x00, 0x00,
+    0x00, 0x49, 0x45, 0x4e, 0x44, 0xae, 0x42, 0x60, 0x82
+  ]);
+  
+  res.writeHead(200, {
+    'Content-Type': 'image/png',
+    'Content-Length': png.length
+  });
+  res.end(png);
+});
+
 // Initialize and start server
 const PORT = process.env.PORT || 3001;
 initializeSDS().catch(err => {
