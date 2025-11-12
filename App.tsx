@@ -131,14 +131,16 @@ const App: React.FC = () => {
   const fetchSdsData = async () => {
     setSdsLoading(true);
     try {
-      const response = await fetch('/api/sds/auction/auction-001/events');
-      const data = await response.json();
+      // Use live WebSocket data instead of backend mock data
+      // sdsData is already populated from WebSocket events in real-time
+      console.log('📊 SDS Data (Live from WebSocket):', sdsData);
       
-      if (data.events && Array.isArray(data.events) && data.events.length > 0) {
-        setSdsData(data.events);
-      } else {
-        setSdsData([]);
-      }
+      // Show toast notification
+      setToast({
+        message: `Loaded ${sdsData.length} events from live stream`,
+        type: 'info'
+      });
+      setTimeout(() => setToast(null), 3000);
     } catch (error) {
       console.error('Error fetching SDS data:', error);
       setSdsData([]);
