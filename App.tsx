@@ -44,7 +44,7 @@ const App: React.FC = () => {
   const [lastBid, setLastBid] = useState<Bid | null>(null);
   const [lastTxHash, setLastTxHash] = useState<string>('');
   const [newBidIndex, setNewBidIndex] = useState<number | null>(null);
-  const [bidAmount, setBidAmount] = useState<string>('0.1');
+  const [bidAmount, setBidAmount] = useState<string>('0.01');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string>('');
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null);
@@ -111,7 +111,7 @@ const App: React.FC = () => {
     const connectWebSocket = () => {
       // Detect environment and use appropriate backend URL
       const backendUrl = typeof window !== 'undefined' && window.location.hostname === 'localhost' 
-        ? 'ws://localhost:3001' 
+        ? 'ws://localhost:3000' 
         : 'wss://backend-4hyellmsz-kohens-projects.vercel.app';
       
       const websocket = new WebSocket(backendUrl);
