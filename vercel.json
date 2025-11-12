@@ -3,19 +3,7 @@
   "public": true,
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
-  "env": {
-    "VITE_BACKEND_URL": "@backend_url"
-  },
-  "functions": {
-    "backend/**/*.js": {
-      "runtime": "nodejs18.x"
-    }
-  },
   "routes": [
-    {
-      "src": "/api(.*)",
-      "dest": "/backend/server.js"
-    },
     {
       "src": "/(.*)",
       "dest": "/index.html"
