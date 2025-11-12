@@ -118,7 +118,7 @@ wss.on('connection', (ws) => {
     timestamp: new Date().toISOString()
   }));
 
-  // Send heartbeat every 30 seconds to keep connection alive
+  // Send heartbeat every 10 seconds to keep connection alive
   const heartbeatInterval = setInterval(() => {
     if (ws.readyState === WebSocket.OPEN) {
       ws.send(JSON.stringify({
@@ -126,7 +126,7 @@ wss.on('connection', (ws) => {
         timestamp: new Date().toISOString()
       }));
     }
-  }, 30000);
+  }, 10000);
 
   ws.on('message', async (message) => {
     try {
