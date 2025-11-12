@@ -341,10 +341,6 @@ const App: React.FC = () => {
       
       setIsConnected(true);
       setNetworkName(chainId === parseInt(SOMNIA_CHAIN.chainId, 16) ? 'Somnia Testnet' : 'Different Network');
-      
-      // Clear disconnect marker
-      localStorage.removeItem('walletDisconnected');
-      
       console.log('🎉 Wallet connection successful!');
 
     } catch (err: any) {
@@ -392,20 +388,21 @@ const App: React.FC = () => {
   const disconnectWallet = () => {
     console.log('🔌 Disconnecting wallet...');
     
-    // Mark as disconnected in localStorage
-    localStorage.setItem('walletDisconnected', 'true');
+    // Remove all listeners FIRST
+    if (window.ethereum) {
+      try {
+        window.ethereum.removeAllListeners?.();
+      } catch (e) {
+        console.log('Could not remove all listeners:', e);
+      }
+    }
     
-    // Clear all wallet state synchronously
+    // Clear all wallet state
     setAccount('');
     setIsConnected(false);
     setIsConnecting(false);
     setNetworkName('');
     setError('');
-    
-    // Remove event listeners when disconnecting
-    if (window.ethereum) {
-      window.ethereum.removeAllListeners?.();
-    }
     
     setToast({
       message: '✅ Wallet disconnected. You can now connect a different wallet.',
@@ -414,39 +411,28 @@ const App: React.FC = () => {
     setTimeout(() => setToast(null), 3000);
   };
 
-  // Listen for account changes
+  // Listen for account changes - only when user explicitly switches account in wallet
   useEffect(() => {
-    if (window.ethereum && isConnected) {
-      const handleAccountsChanged = (accounts: string[]) => {
-        console.log('👛 Accounts changed:', accounts);
-        // Check if user manually disconnected in wallet
-        const wasDisconnected = localStorage.getItem('walletDisconnected') === 'true';
-        if (accounts.length === 0 || wasDisconnected) {
-          // Disconnect if no accounts or user marked as disconnected
-          console.log('🔌 User disconnected from wallet or marked as disconnected');
-          disconnectWallet();
-        } else if (accounts.length > 0) {
-          // Update with new account
-          setAccount(accounts[0]);
-          setIsConnected(true);
-        }
-      };
+    if (!window.ethereum) return;
 
-      const handleChainChanged = (chainId: string) => {
-        console.log('🌐 Chain changed:', chainId);
-        setNetworkName(chainId === '0xC488' ? 'Somnia Testnet' : 'Unknown Network');
-        // Reload the page when network changes
-        window.location.reload();
-      };
+    const handleAccountsChanged = (accounts: string[]) => {
+      console.log('👛 Accounts changed in wallet:', accounts);
+      // If user switched accounts in the wallet, reflect it
+      if (accounts.length > 0 && isConnected) {
+        setAccount(accounts[0]);
+      } else if (accounts.length === 0 && isConnected) {
+        // User disconnected all accounts
+        console.log('🔌 User disconnected all accounts from wallet');
+        setAccount('');
+        setIsConnected(false);
+      }
+    };
 
-      window.ethereum.on('accountsChanged', handleAccountsChanged);
-      window.ethereum.on('chainChanged', handleChainChanged);
+    window.ethereum.on('accountsChanged', handleAccountsChanged);
 
-      return () => {
-        window.ethereum?.removeListener('accountsChanged', handleAccountsChanged);
-        window.ethereum?.removeListener('chainChanged', handleChainChanged);
-      };
-    }
+    return () => {
+      window.ethereum?.removeListener('accountsChanged', handleAccountsChanged);
+    };
   }, [isConnected]);
 
   // Bid placement with MetaMask

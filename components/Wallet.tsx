@@ -21,7 +21,8 @@ export const Wallet: React.FC<WalletProps> = ({
   onConnect,
   onDisconnect
 }) => {
-    if (!isConnected) {
+    // If not connected, show connect button
+    if (!isConnected || !account) {
         return (
             <Button 
               variant="primary" 
