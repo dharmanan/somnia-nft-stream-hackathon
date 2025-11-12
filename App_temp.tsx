@@ -154,7 +154,14 @@ const App: React.FC = () => {
   // WebSocket connection for real-time SDS subscription
   useEffect(() => {
     const connectWebSocket = () => {
-      // Prevent duplicate connection attempts
+      // WebSocket not supported on Vercel serverless
+      // Using REST API fallback only
+      console.log('⚠️ WebSocket not available on serverless platform, using REST API fallback');
+      setWs(null);
+      return;
+      
+      /*
+      // Original WebSocket code (disabled for Vercel serverless)
       if (wsConnectingRef.current || wsRef.current?.readyState === WebSocket.OPEN) {
         console.log('⚠️ WebSocket connection already in progress or connected');
         return;
@@ -168,8 +175,8 @@ const App: React.FC = () => {
       const wsProtocol = isSecure ? 'wss' : 'ws';
       
       const backendUrl = isDevelopment
-        ? `${wsProtocol}://localhost:3001`
-        : `${wsProtocol}://${import.meta.env.VITE_BACKEND_URL}`;
+        ? `${wsProtocol}://localhost:3000/ws`
+        : `${wsProtocol}://${import.meta.env.VITE_BACKEND_URL}/ws`;
       
       console.log(`🔌 Connecting to WebSocket: ${backendUrl} (Dev: ${isDevelopment}, Secure: ${isSecure})`);
       const websocket = new WebSocket(backendUrl);
@@ -266,7 +273,7 @@ const App: React.FC = () => {
     };
   }, []);
 
-    // Check if any Ethereum wallet is installed
+  // Check if any Ethereum wallet is installed
   const isWalletInstalled = () => {
     if (typeof window === 'undefined') return false;
     
@@ -477,11 +484,7 @@ const App: React.FC = () => {
         console.warn('⚠️ WebSocket not ready, using REST fallback...');
         // Fallback to REST if WebSocket not available
         try {
-          const backendUrl = import.meta.env.DEV 
-            ? 'http://localhost:3001' 
-            : import.meta.env.VITE_BACKEND_URL;
-          
-          const response = await fetch(`${backendUrl}/api/sds/publish-event`, {
+          const response = await fetch('/api/sds/publish-event', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -695,151 +698,6 @@ const App: React.FC = () => {
                             className="text-indigo-400 hover:underline font-mono"
                           >
                             {lastTxHash.slice(0, 10)}...{lastTxHash.slice(-8)}
-                          </a>
-                        </p>
-                      )}
-                      <p className="text-xs text-gray-500 mt-1">Just now</p>
-                    </div>
-                  </div>
-                ) : (
-                  <p className="text-gray-400">Waiting for first bid...</p>
-                )}
-                <div className="text-xs text-gray-500">
-                  {isConnected ? '💡 WebSocket Live (Real-time SDS updates)' : '💡 HTTP polling (Backend API required for live SDS)'}
-                </div>
-                <div className={`text-xs font-semibold ${isConnected ? 'text-green-400' : 'text-indigo-400'}`}>
-                  {isConnected ? '✅ SDS Integration Active' : '🔌 SDS Integration Ready (Connect backend for live stream)'}
-                </div>
-              </div>
-            </Card>
-          </div>
-
-          {/* Main Content Grid */}
-          <Card title="SDS Integration" icon={<Icon name="sds" />}>
-            <div className="space-y-4">
-              <div className="flex items-center space-x-2">
-                <span className="relative flex h-3 w-3">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
-                </span>
-                <span className="text-sm text-gray-300">Real-time WebSocket streaming active</span>
-              </div>
-              <div className="text-xs text-gray-400">
-                <p>✅ Connected to Somnia Data Streams</p>
-                <p>📡 Blockchain events streaming live via WebSocket</p>
-              </div>
-            </div>
-          </Card>
-
-          <Card title="Place Your Bid" icon={<Icon name="bid" />}>
-            <div className="flex flex-col sm:flex-row items-center space-y-3 sm:space-y-0 sm:space-x-4">
-              <input
-                type="number"
-                step="0.1"
-                value={bidAmount}
-                onChange={(e) => setBidAmount(e.target.value)}
-                className="bg-white/5 border border-white/20 rounded-lg px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 w-full sm:w-auto flex-grow"
-              />
-              <span className="font-bold text-gray-400">STT</span>
-              <Button 
-                variant="success" 
-                className="w-full sm:w-auto" 
-                onClick={placeBid}
-                disabled={isLoading}
-              >
-                {isLoading ? 'Placing...' : 'Place Bid'}
-              </Button>
-            </div>
-            <p className="text-xs text-gray-400 mt-2">
-              {auctionStatus ? `Min bid: ${(parseFloat(auctionStatus.highestBid) + 0.0001).toFixed(4)} STT` : 'Loading minimum bid...'}
-            </p>
-          </Card>
-
-          <Card title="Auction Status" icon={<Icon name="status" />} className="lg:row-span-2 flex flex-col">
-            <div className="flex-grow flex flex-col justify-center items-center space-y-4">
-              <Button fullWidth onClick={fetchAuctionStatus} disabled={isLoading}>
-                <div className="flex items-center justify-center space-x-2">
-                  <Icon name="refresh" />
-                  <span>{isLoading ? 'Loading...' : 'Refresh Status'}</span>
-                </div>
-              </Button>
-              
-              {auctionStatus ? (
-                <div className="w-full space-y-3 text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-gray-400">Status:</span>
-                    <span className={`font-bold ${auctionStatus.auctionStarted ? 'text-green-400' : 'text-yellow-400'}`}>
-                      {auctionStatus.auctionStarted ? 'Active' : 'Not Started'}
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-400">Highest Bid:</span>
-                    <span className="font-bold text-indigo-400">{auctionStatus.highestBid} STT</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-400">Highest Bidder:</span>
-                    <span className="font-mono text-xs text-gray-300">
-                      {auctionStatus.highestBidder.slice(0, 6)}...{auctionStatus.highestBidder.slice(-4)}
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-400">End Time:</span>
-                    <span className="text-xs text-gray-300">
-                      {new Date(auctionStatus.endTime * 1000).toLocaleString()}
-                    </span>
-                  </div>
-                </div>
-              ) : (
-                <p className="text-sm text-gray-400 text-center">Loading auction status...</p>
-              )}
-            </div>
-          </Card>
-
-          <Card title="NFT Information" icon={<Icon name="nft" />}>
-            <div className="space-y-2 text-sm">
-              <p><span className="font-semibold text-gray-300">NFT Name:</span> Somnia Hackathon NFT #{auctionStatus?.nftId || '0'}</p>
-              <p><span className="font-semibold text-gray-300">Contract:</span> {auctionStatus?.nftContract ? `${auctionStatus.nftContract.slice(0, 6)}...${auctionStatus.nftContract.slice(-4)}` : 'Loading...'}</p>
-              <p><span className="font-semibold text-gray-300">Token ID:</span> {auctionStatus?.nftId || 'Loading...'}</p>
-              <p><span className="font-semibold text-gray-300">Seller:</span> {auctionStatus?.seller ? `${auctionStatus.seller.slice(0, 6)}...${auctionStatus.seller.slice(-4)}` : 'Loading...'}</p>
-            </div>
-          </Card>
-
-          <Card title="Bid History" icon={<Icon name="history" />}>
-            <div className="space-y-2 max-h-40 overflow-y-auto pr-2">
-              {bids && bids.length > 0 ? (
-                bids.slice(0, 10).map((bid, index) => (
-                  <div 
-                    key={index} 
-                    className={`flex justify-between items-center bg-black/20 p-3 rounded-lg text-sm transition-all duration-500 ${
-                      index === 0 ? 'animate-slide-in-right bg-indigo-500/20' : ''
-                    }`}
-                  >
-                    <span className="font-mono text-gray-300">{bid.address}</span>
-                    <span className="font-bold text-indigo-400">{bid.amount.toFixed(4)} STT</span>
-                  </div>
-                ))
-              ) : (
-                <p className="text-gray-500 text-sm text-center py-4">No bids yet...</p>
-              )}
-            </div>
-          </Card>
-        </main>
-      </div>
-      
-      {/* Toast Notification */}
-      {toast && (
-        <div className={`fixed bottom-8 left-1/2 transform -translate-x-1/2 px-6 py-3 rounded-lg font-semibold text-white text-center animate-pulse transition-all duration-300 ${
-          toast.type === 'success' ? 'bg-green-500/80' : 
-          toast.type === 'error' ? 'bg-red-500/80' : 
-          'bg-blue-500/80'
-        }`}>
-          {toast.message}
-        </div>
-      )}
-      
-      <Footer />
-    </div>
-  );
 };
 
 export default App;

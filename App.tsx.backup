@@ -154,7 +154,14 @@ const App: React.FC = () => {
   // WebSocket connection for real-time SDS subscription
   useEffect(() => {
     const connectWebSocket = () => {
-      // Prevent duplicate connection attempts
+      // WebSocket not supported on Vercel serverless
+      // Using REST API fallback only
+      console.log('⚠️ WebSocket not available on serverless platform, using REST API fallback');
+      setWs(null);
+      return;
+      
+      /*
+      // Original WebSocket code (disabled for Vercel serverless)
       if (wsConnectingRef.current || wsRef.current?.readyState === WebSocket.OPEN) {
         console.log('⚠️ WebSocket connection already in progress or connected');
         return;
@@ -168,8 +175,8 @@ const App: React.FC = () => {
       const wsProtocol = isSecure ? 'wss' : 'ws';
       
       const backendUrl = isDevelopment
-        ? `${wsProtocol}://localhost:3001`
-        : `${wsProtocol}://${import.meta.env.VITE_BACKEND_URL}`;
+        ? `${wsProtocol}://localhost:3000/ws`
+        : `${wsProtocol}://${import.meta.env.VITE_BACKEND_URL}/ws`;
       
       console.log(`🔌 Connecting to WebSocket: ${backendUrl} (Dev: ${isDevelopment}, Secure: ${isSecure})`);
       const websocket = new WebSocket(backendUrl);
@@ -266,7 +273,7 @@ const App: React.FC = () => {
     };
   }, []);
 
-    // Check if any Ethereum wallet is installed
+  // Check if any Ethereum wallet is installed
   const isWalletInstalled = () => {
     if (typeof window === 'undefined') return false;
     
@@ -477,11 +484,7 @@ const App: React.FC = () => {
         console.warn('⚠️ WebSocket not ready, using REST fallback...');
         // Fallback to REST if WebSocket not available
         try {
-          const backendUrl = import.meta.env.DEV 
-            ? 'http://localhost:3001' 
-            : import.meta.env.VITE_BACKEND_URL;
-          
-          const response = await fetch(`${backendUrl}/api/sds/publish-event`, {
+          const response = await fetch('/api/sds/publish-event', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
