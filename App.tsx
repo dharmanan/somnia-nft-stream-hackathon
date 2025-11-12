@@ -167,10 +167,10 @@ const App: React.FC = () => {
       const isSecure = typeof window !== 'undefined' && window.location.protocol === 'https:';
       const wsProtocol = isSecure ? 'wss' : 'ws';
       
-      // Use relative URL in production (same server), localhost in dev
+      // Use Railway backend URL from env or localhost in dev
       const backendUrl = isDevelopment
         ? `${wsProtocol}://localhost:3001`
-        : `${wsProtocol}://${window.location.host}`;
+        : `${wsProtocol}://${import.meta.env.VITE_BACKEND_URL || window.location.host}`;
       
       console.log(`🔌 Connecting to WebSocket: ${backendUrl} (Dev: ${isDevelopment}, Secure: ${isSecure})`);
       const websocket = new WebSocket(backendUrl);
@@ -480,7 +480,7 @@ const App: React.FC = () => {
         try {
           const backendUrl = import.meta.env.DEV 
             ? 'http://localhost:3001' 
-            : `${window.location.protocol}//${window.location.host}`;
+            : `https://${import.meta.env.VITE_BACKEND_URL || window.location.host}`;
           
           const response = await fetch(`${backendUrl}/api/sds/publish-event`, {
             method: 'POST',
