@@ -8,7 +8,7 @@ export default defineConfig(({ mode }) => {
       server: {
         port: 3001,
         host: '0.0.0.0',
-        proxy: {
+        proxy: mode === 'development' ? {
           '/api': {
             target: 'http://localhost:3000',
             changeOrigin: true,
@@ -19,13 +19,17 @@ export default defineConfig(({ mode }) => {
             ws: true,
             changeOrigin: true,
           },
-        },
+        } : undefined,
       },
       plugins: [react()],
       resolve: {
         alias: {
           '@': path.resolve(__dirname, '.'),
         }
+      },
+      build: {
+        outDir: 'dist',
+        sourcemap: false,
       }
     };
 });
