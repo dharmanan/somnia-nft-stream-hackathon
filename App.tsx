@@ -110,10 +110,17 @@ const App: React.FC = () => {
   useEffect(() => {
     const connectWebSocket = () => {
       // Detect environment and use appropriate backend URL
-      const backendUrl = typeof window !== 'undefined' && window.location.hostname === 'localhost' 
+      const isLocalhost = typeof window !== 'undefined' && (
+        window.location.hostname === 'localhost' || 
+        window.location.hostname === '127.0.0.1' ||
+        window.location.hostname.includes('10.')
+      );
+      
+      const backendUrl = isLocalhost 
         ? 'ws://localhost:3000' 
         : 'wss://backend-4hyellmsz-kohens-projects.vercel.app';
       
+      console.log(`🔌 Connecting to WebSocket: ${backendUrl}`);
       const websocket = new WebSocket(backendUrl);
 
       websocket.onopen = () => {
