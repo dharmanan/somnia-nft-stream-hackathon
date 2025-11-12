@@ -48,7 +48,6 @@ const App: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string>('');
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null);
-  const [testSdsLoading, setTestSdsLoading] = useState(false);
   
   // MetaMask state
   const [account, setAccount] = useState<string>('');
@@ -714,58 +713,16 @@ const App: React.FC = () => {
           {/* Main Content Grid */}
           <Card title="SDS Integration" icon={<Icon name="sds" />}>
             <div className="space-y-4">
-              <Button 
-                fullWidth 
-                disabled={testSdsLoading}
-                onClick={async () => {
-                  if (testSdsLoading) return; // Prevent multiple rapid clicks
-                  
-                  try {
-                    setTestSdsLoading(true);
-                    setToast({ message: '📡 Testing SDS streaming...', type: 'info' });
-                    
-                    // Test SDS by publishing a demo event
-                    const response = await fetch('/api/sds/publish-event', {
-                      method: 'POST',
-                      headers: { 'Content-Type': 'application/json' },
-                      body: JSON.stringify({
-                        eventType: 'BID_PLACED',
-                        auctionId: 'demo-test',
-                        data: {
-                          bidder: '0x1234567890123456789012345678901234567890',
-                          bidAmount: '0.001'
-                        }
-                      })
-                    });
-                    const result = await response.json();
-                    if (result.success) {
-                      setToast({ message: '✅ SDS test successful! Event streamed via WebSocket', type: 'success' });
-                      setTimeout(() => setToast(null), 3000);
-                    } else {
-                      setToast({ message: '📡 Event sent (check console)', type: 'info' });
-                      setTimeout(() => setToast(null), 2000);
-                    }
-                  } catch (err) {
-                    setToast({ message: '📡 SDS test initiated', type: 'info' });
-                    setTimeout(() => setToast(null), 2000);
-                  } finally {
-                    // Cooldown: disable button for 2 seconds to prevent spam
-                    setTimeout(() => setTestSdsLoading(false), 2000);
-                  }
-                }}
-              >
-                {testSdsLoading ? 'Testing...' : 'Test SDS Streaming'}
-              </Button>
               <div className="flex items-center space-x-2">
                 <span className="relative flex h-3 w-3">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
                   <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
                 </span>
-                <span className="text-sm text-gray-300">Real-time streaming active</span>
+                <span className="text-sm text-gray-300">Real-time WebSocket streaming active</span>
               </div>
               <div className="text-xs text-gray-400">
-                <p>Connected to Somnia Data Streams</p>
-                <p>Blockchain events streaming live</p>
+                <p>✅ Connected to Somnia Data Streams</p>
+                <p>📡 Blockchain events streaming live via WebSocket</p>
               </div>
             </div>
           </Card>
