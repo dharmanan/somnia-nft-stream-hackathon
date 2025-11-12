@@ -793,9 +793,11 @@ const App: React.FC = () => {
                   <div className="space-y-2">
                     <p className="text-gray-400">Latest Bid:</p>
                     <div className="bg-indigo-500/20 p-3 rounded-lg">
-                      <div className="flex justify-between items-center">
-                        <span className="font-mono text-sm text-gray-300">{lastBid.address}</span>
-                        <span className="font-bold text-indigo-400">{lastBid.amount.toFixed(4)} STT</span>
+                      <div className="flex justify-between items-center gap-2">
+                        <span className="font-mono text-xs text-gray-300 truncate">
+                          {lastBid.address.length > 20 ? `${lastBid.address.slice(0, 6)}...${lastBid.address.slice(-4)}` : lastBid.address}
+                        </span>
+                        <span className="font-bold text-indigo-400 flex-shrink-0">{lastBid.amount.toFixed(4)} STT</span>
                       </div>
                       {lastTxHash && (
                         <p className="text-xs text-gray-500 mt-1">
@@ -950,8 +952,10 @@ const App: React.FC = () => {
                       index === 0 ? 'animate-slide-in-right bg-indigo-500/20' : ''
                     }`}
                   >
-                    <span className="font-mono text-gray-300">{bid.address}</span>
-                    <span className="font-bold text-indigo-400">{bid.amount.toFixed(4)} STT</span>
+                    <span className="font-mono text-gray-300 truncate text-xs">
+                      {bid.address.length > 20 ? `${bid.address.slice(0, 6)}...${bid.address.slice(-4)}` : bid.address}
+                    </span>
+                    <span className="font-bold text-indigo-400 flex-shrink-0">{bid.amount.toFixed(4)} STT</span>
                   </div>
                 ))
               ) : (
