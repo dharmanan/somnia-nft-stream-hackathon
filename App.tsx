@@ -81,7 +81,7 @@ const App: React.FC = () => {
         return;
       }
 
-      // Read from contract directly
+      // Read from contract directly with fresh provider (no cache)
       const auctionAbi = [
         "function highestBid() view returns (uint256)",
         "function highestBidder() view returns (address)",
@@ -89,12 +89,20 @@ const App: React.FC = () => {
       ];
 
       const auctionAddress = '0x811CD7090a8e7b63ee466A7610d7e28Ba0cda6ef';
-      const provider = new ethers.BrowserProvider((window as any).ethereum);
+      // Create fresh provider to bypass cache
+      const provider = new ethers.JsonRpcProvider('https://dream-rpc.somnia.network/');
       const auctionContract = new ethers.Contract(auctionAddress, auctionAbi, provider);
 
+      console.log('📊 Fetching auction status from contract...');
       const highestBid = await auctionContract.highestBid();
       const highestBidder = await auctionContract.highestBidder();
       const endTime = await auctionContract.endTime();
+
+      console.log('📊 Contract data:', {
+        highestBid: ethers.formatEther(highestBid),
+        highestBidder: highestBidder,
+        endTime: Number(endTime)
+      });
 
       setAuctionStatus({
         auctionStarted: true,
