@@ -105,6 +105,16 @@ wss.on('connection', (ws) => {
     timestamp: new Date().toISOString()
   }));
 
+  // Send heartbeat every 30 seconds to keep connection alive
+  const heartbeatInterval = setInterval(() => {
+    if (ws.readyState === WebSocket.OPEN) {
+      ws.send(JSON.stringify({
+        type: 'heartbeat',
+        timestamp: new Date().toISOString()
+      }));
+    }
+  }, 30000);
+
   ws.on('message', async (message) => {
     try {
       const data = JSON.parse(message);
@@ -197,6 +207,7 @@ wss.on('connection', (ws) => {
   ws.on('close', () => {
     console.log('🔌 Client disconnected');
     connectedClients.delete(ws);
+    clearInterval(heartbeatInterval);
     
     // Clean up subscriptions for this client
     activeSubscriptions.forEach((sub, id) => {
