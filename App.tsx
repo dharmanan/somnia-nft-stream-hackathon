@@ -143,7 +143,16 @@ const App: React.FC = () => {
             };
             setBids(prev => [newBid, ...prev.slice(0, 9)]);
             setLastBid(newBid);
-            setSdsData(prev => [data, ...prev.slice(0, 19)]);
+            
+            // Format event for display - flatten the data structure
+            const displayEvent = {
+              eventType: data.eventType,
+              timestamp: data.timestamp,
+              bidder: data.data.bidder,
+              bidAmount: data.data.bidAmount,
+              txHash: data.data.txHash
+            };
+            setSdsData(prev => [displayEvent, ...prev.slice(0, 19)]);
             // Refresh auction status
             fetchAuctionStatus();
             
