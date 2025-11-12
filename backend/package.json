@@ -6,7 +6,8 @@
   "type": "module",
   "scripts": {
     "start": "node server.js",
-    "dev": "node server.js"
+    "dev": "node server.js",
+    "postinstall": "cd .. && npm run build || true"
   },
   "dependencies": {
     "@somnia-chain/streams": "^0.9.5",
