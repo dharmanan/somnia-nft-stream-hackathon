@@ -61,6 +61,7 @@ const App: React.FC = () => {
   const [sdsLoading, setSdsLoading] = useState(false);
   const wsRef = useRef<WebSocket | null>(null);
   const wsConnectingRef = useRef(false);
+  const wsReconnectCountRef = useRef(0);
 
   // Somnia testnet configuration
   const SOMNIA_CHAIN = {
@@ -180,6 +181,7 @@ const App: React.FC = () => {
         wsRef.current = websocket;
         setWs(websocket);
         wsConnectingRef.current = false;
+        wsReconnectCountRef.current = 0; // Reset reconnect counter on successful connection
         
         // Subscribe to BID_PLACED events via SDS
         websocket.send(JSON.stringify({
@@ -253,7 +255,13 @@ const App: React.FC = () => {
         console.log('🔌 SDS WebSocket disconnected, reconnecting...');
         wsConnectingRef.current = false;
         wsRef.current = null;
-        setTimeout(connectWebSocket, 3000);
+        
+        // Exponential backoff: 3s, 6s, 12s, 30s max
+        wsReconnectCountRef.current++;
+        const delay = Math.min(3000 * Math.pow(2, wsReconnectCountRef.current - 1), 30000);
+        console.log(`⏱️ Reconnect attempt ${wsReconnectCountRef.current} in ${delay}ms`);
+        
+        setTimeout(connectWebSocket, delay);
       };
 
       websocket.onerror = (error) => {

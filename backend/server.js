@@ -21,21 +21,28 @@ const corsOptions = {
   optionsSuccessStatus: 200
 };
 
-app.use(cors(corsOptions));
-app.use(express.json());
-
-// Force CORS headers on all responses
+// Middleware to allow credentials and set permissive CORS
 app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  res.header('Access-Control-Allow-Credentials', 'true');
+  const origin = req.headers.origin || req.headers.referer || '*';
   
+  // Always set CORS headers FIRST, before anything else
+  res.setHeader('Access-Control-Allow-Origin', origin);
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, HEAD');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept');
+  res.setHeader('Access-Control-Max-Age', '86400');
+  
+  // If it's a preflight request, respond immediately
   if (req.method === 'OPTIONS') {
-    return res.sendStatus(200);
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Content-Length', '0');
+    return res.sendStatus(204);
   }
+  
   next();
 });
+
+app.use(express.json());
+app.use(cors(corsOptions));
 
 // Define supported event schemas for schema-based filtering
 const SUPPORTED_SCHEMAS = {
