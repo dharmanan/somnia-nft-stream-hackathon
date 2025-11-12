@@ -76,13 +76,46 @@ const App: React.FC = () => {
   // Backend'den auction status'ü çek
   const fetchAuctionStatus = async () => {
     try {
-      const response = await fetch('/api/auction/status');
-      const data = await response.json();
-      setAuctionStatus(data);
+      if (!account) {
+        console.warn('No account connected, skipping auction status fetch');
+        return;
+      }
+
+      // Read from contract directly
+      const auctionAbi = [
+        "function highestBid() view returns (uint256)",
+        "function highestBidder() view returns (address)",
+        "function endTime() view returns (uint256)"
+      ];
+
+      const auctionAddress = '0x811CD7090a8e7b63ee466A7610d7e28Ba0cda6ef';
+      const provider = new ethers.BrowserProvider((window as any).ethereum);
+      const auctionContract = new ethers.Contract(auctionAddress, auctionAbi, provider);
+
+      const highestBid = await auctionContract.highestBid();
+      const highestBidder = await auctionContract.highestBidder();
+      const endTime = await auctionContract.endTime();
+
+      setAuctionStatus({
+        auctionStarted: true,
+        highestBid: ethers.formatEther(highestBid),
+        highestBidder: highestBidder,
+        endTime: Number(endTime),
+        nftContract: '0x6c5cE10cD5dcE7250f5dF94599Ec6869158E966f',
+        nftId: '1',
+        seller: '0xabcdefabcdefabcdefabcdefabcdefabcdefabcd'
+      });
       setError('');
     } catch (err) {
-      setError('Failed to fetch auction status');
-      console.error('Error fetching auction status:', err);
+      console.error('Error fetching auction status from contract:', err);
+      // Fallback to backend API
+      try {
+        const response = await fetch('/api/auction/status');
+        const data = await response.json();
+        setAuctionStatus(data);
+      } catch (backendErr) {
+        setError('Failed to fetch auction status');
+      }
     }
   };
 
@@ -367,8 +400,8 @@ const App: React.FC = () => {
       // Check if bid is higher than current highest bid
       const currentHighestBid = await auctionContract.highestBid();
       if (bidAmountWei <= currentHighestBid) {
-        const minBid = '0.0143';
-        setError(`Bid must be higher than current highest bid. Minimum: ${minBid} STT`);
+        const minBidAmount = ethers.formatEther(currentHighestBid + BigInt(100000000000000)); // Add 0.0001
+        setError(`Bid must be higher than current highest bid. Minimum: ${minBidAmount} STT`);
         return;
       }
 
