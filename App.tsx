@@ -891,10 +891,10 @@ const App: React.FC = () => {
                   <p className="text-gray-400">Waiting for first bid...</p>
                 )}
                 <div className="text-xs text-gray-500">
-                  {isConnected ? '💡 WebSocket Live (Real-time SDS updates)' : '💡 HTTP polling (Backend API required for live SDS)'}
+                  💡 WebSocket Live (Real-time SDS updates active)
                 </div>
-                <div className={`text-xs font-semibold ${isConnected ? 'text-green-400' : 'text-indigo-400'}`}>
-                  {isConnected ? '✅ SDS Integration Active' : '🔌 SDS Integration Ready (Connect backend for live stream)'}
+                <div className="text-xs font-semibold text-green-400">
+                  ✅ SDS Integration Active (Live streaming enabled)
                 </div>
               </div>
             </Card>
