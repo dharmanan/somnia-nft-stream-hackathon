@@ -348,10 +348,18 @@ const App: React.FC = () => {
 
     try {
       console.log('📋 Requesting accounts...');
-      // Request account access
+      // Request account access - this may return cached account
       const accounts = await (window.ethereum as any).request({ method: 'eth_requestAccounts' });
       const account = accounts[0];
       console.log('✅ Connected account:', account);
+      
+      // Check if this was just after disconnect - if so, warn user
+      const wasJustDisconnected = localStorage.getItem('wasDisconnected') === 'true';
+      if (wasJustDisconnected) {
+        console.warn('⚠️ Account was just disconnected, may be cached account');
+        setError('ℹ️ Please confirm you want to use this wallet. Close MetaMask and reopen if you want to switch accounts.');
+      }
+      
       setAccount(account);
 
       // Try to switch to Somnia testnet
@@ -437,6 +445,24 @@ const App: React.FC = () => {
     
     // Set marker BEFORE clearing storage
     localStorage.setItem('wasDisconnected', 'true');
+    
+    // Clear MetaMask/wallet related localStorage entries
+    const keysToRemove = [];
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key && (
+        key.includes('metamask') || 
+        key.includes('wallet') || 
+        key.includes('ethereum') ||
+        key.includes('web3')
+      )) {
+        keysToRemove.push(key);
+      }
+    }
+    keysToRemove.forEach(key => {
+      console.log(`🗑️ Removing localStorage key: ${key}`);
+      localStorage.removeItem(key);
+    });
     
     // Clear all other storage
     sessionStorage.clear();
