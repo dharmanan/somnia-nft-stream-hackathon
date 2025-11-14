@@ -5,6 +5,10 @@ A cutting-edge NFT auction platform built for the Somnia Data Streams Mini Hacka
 ## 🚀 Live Demo
 🎯 Try the Live Demo: https://somniastream.vercel.app/
 
+📺 **Watch the Demo**: https://www.youtube.com/watch?v=2UbIOuQJfQI
+
+![Somnia NFT Auction House Dashboard](./public/dash.png)
+
 ⚠️ TESTNET - For Testing Only
 
 Network: Somnia Testnet (Shannon) - Chain ID: 50312
@@ -17,6 +21,7 @@ All transactions are on testnet - No real value, for development and testing onl
 - **Backend**: Deployed on [Railway](https://railway.app/) - Real-time API and SDS integration
 - **Network**: Somnia Testnet (Shannon) - Chain ID: 50312
 - **RPC Endpoint**: https://dream-rpc.somnia.network/
+- **Video Demo**: https://www.youtube.com/watch?v=2UbIOuQJfQI
 
 ## Features
 
