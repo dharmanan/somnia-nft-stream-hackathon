@@ -11,6 +11,13 @@ Network: Somnia Testnet (Shannon) - Chain ID: 50312
 Currency: Test STT tokens ([Get from Somnia Faucet](https://testnet.somnia.network/))
 All transactions are on testnet - No real value, for development and testing only
 
+## 🌐 Deployment
+
+- **Frontend**: Deployed on [Vercel](https://vercel.com/) - https://somniastream.vercel.app/
+- **Backend**: Deployed on [Railway](https://railway.app/) - Real-time API and SDS integration
+- **Network**: Somnia Testnet (Shannon) - Chain ID: 50312
+- **RPC Endpoint**: https://dream-rpc.somnia.network/
+
 ## Features
 
 - **MetaMask Integration**: Automatic Somnia Testnet configuration
