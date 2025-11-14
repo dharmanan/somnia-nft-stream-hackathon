@@ -63,6 +63,7 @@ const App: React.FC = () => {
   const wsRef = useRef<WebSocket | null>(null);
   const wsConnectingRef = useRef(false);
   const wsReconnectCountRef = useRef(0);
+  const listenersDisabledRef = useRef(false);
 
   // Somnia testnet configuration
   const SOMNIA_CHAIN = {
@@ -86,6 +87,10 @@ const App: React.FC = () => {
     if (wasDisconnected) {
       console.log('🔄 Page reloaded after disconnect - clearing all state');
       localStorage.removeItem('wasDisconnected');
+      
+      // Re-enable listeners for fresh connection
+      listenersDisabledRef.current = false;
+      console.log('✅ Listeners re-enabled for new connection');
       
       // Hard reset all state
       flushSync(() => {
@@ -422,6 +427,10 @@ const App: React.FC = () => {
   const disconnectWallet = () => {
     console.log('🔌 Disconnecting wallet - full reset...');
     
+    // Disable listeners to prevent auto-reconnect
+    listenersDisabledRef.current = true;
+    console.log('🚫 Listeners disabled');
+    
     // Set marker BEFORE clearing storage
     localStorage.setItem('wasDisconnected', 'true');
     
@@ -474,6 +483,12 @@ const App: React.FC = () => {
     if (!window.ethereum) return;
 
     const handleAccountsChanged = (accounts: string[]) => {
+      // Skip if listeners are disabled (after disconnect)
+      if (listenersDisabledRef.current) {
+        console.log('🚫 Listeners disabled, ignoring accountsChanged event');
+        return;
+      }
+      
       console.log('👛 Accounts changed in wallet:', accounts);
       // If user switched accounts in the wallet, reflect it
       if (accounts.length > 0 && isConnected) {
