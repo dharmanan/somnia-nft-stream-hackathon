@@ -332,6 +332,10 @@ const App: React.FC = () => {
   const connectWallet = async () => {
     console.log('🔗 Connecting to wallet...');
     console.log('Wallet available:', !!window.ethereum);
+    
+    // Re-enable listeners for this new connection
+    listenersDisabledRef.current = false;
+    console.log('✅ Listeners enabled for new connection');
 
     if (!isWalletInstalled()) {
       // Show error with WalletConnect option
