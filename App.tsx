@@ -79,13 +79,17 @@ const App: React.FC = () => {
 
   // Check on mount if page was reloaded after disconnect - if so, reset everything
   useEffect(() => {
+    console.log('🎬 App mounted');
     const wasDisconnected = localStorage.getItem('wasDisconnected') === 'true';
+    console.log('📍 wasDisconnected marker:', wasDisconnected);
+    
     if (wasDisconnected) {
       console.log('🔄 Page reloaded after disconnect - clearing all state');
       localStorage.removeItem('wasDisconnected');
       
       // Hard reset all state
       flushSync(() => {
+        console.log('🔄 Flushing state resets...');
         setAccount('');
         setIsConnected(false);
         setIsConnecting(false);
@@ -95,7 +99,9 @@ const App: React.FC = () => {
         setLastBid(null);
         setSdsData([]);
       });
-      console.log('✅ All state reset');
+      console.log('✅ All state reset complete');
+    } else {
+      console.log('ℹ️ Normal mount, no disconnect marker');
     }
   }, []);
 
