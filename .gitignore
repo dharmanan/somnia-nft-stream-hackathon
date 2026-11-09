@@ -26,3 +26,5 @@ dist-ssr
 
 # TLS private keys
 backend/key.pem
+
+backend/cert.pem
